@@ -19,6 +19,6 @@ def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
     config = load_config()
     self.server.broadcast_message(f"{config['modules']['broadcast']['prefix']}{args[0]}")
 
-    if config["modules"]["broadcast"]["playsound"] is not "":
+    if config["modules"]["broadcast"]["playsound"] != "":
         for player in self.server.online_players:
             player.play_sound(player.location, config["modules"]["broadcast"]["playsound"])

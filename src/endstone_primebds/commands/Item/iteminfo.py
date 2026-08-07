@@ -1,4 +1,5 @@
 from endstone.command import CommandSender
+from endstone import Player
 from endstone_primebds.utils.command_util import create_command
 from endstone_primebds.utils.target_selector_util import get_matching_actors
 
@@ -53,6 +54,9 @@ def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
         targets = [sender]
 
     for target in targets:
+        if not isinstance(target, Player):
+            sender.send_message("§cItem information is only available for players")
+            continue
         inv = target.inventory
 
         held_item = None

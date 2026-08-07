@@ -94,7 +94,7 @@ def load_config():
         os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
         cache = default_config
         # DON'T save immediately
-        print(f"[PrimeBDS] Config file not found, using defaults in memory.")
+        print(f"[EssentialsBDS] Config file not found, using defaults in memory.")
         return cache
 
     try:
@@ -105,12 +105,12 @@ def load_config():
         else:
             cache = default_config
             # DON'T save immediately
-            print(f"[PrimeBDS] Config file empty, using defaults in memory.")
+            print(f"[EssentialsBDS] Config file empty, using defaults in memory.")
     except json.JSONDecodeError as e:
-        print(f"[PrimeBDS] JSON error in config.json: {e}. Using defaults in memory.")
+        print(f"[EssentialsBDS] JSON error in config.json: {e}. Using defaults in memory.")
         cache = default_config
     except OSError as e:
-        print(f"[PrimeBDS] Failed to read config.json: {e}. Using defaults in memory.")
+        print(f"[EssentialsBDS] Failed to read config.json: {e}. Using defaults in memory.")
         cache = default_config
 
     return cache

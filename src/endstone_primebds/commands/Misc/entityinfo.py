@@ -1,6 +1,7 @@
 from collections import Counter
 import math
 from endstone import Player
+from endstone.actor import Mob
 from endstone.command import CommandSender
 try:
     from endstone.command import BlockCommandSender
@@ -41,6 +42,7 @@ def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
             return False
         actor = get_target_entity(sender)
         if actor != None:
+            health = f"{actor.health}/{actor.max_health}" if isinstance(actor, Mob) else "N/A"
             sender.send_message(f"""§bEntity Information:
 §7- §eName: §f"{getattr(actor, "name_tag", None) or "Unset"}"
 §7- §eType: §f{actor.type}
@@ -49,7 +51,7 @@ def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
 §7- §eLocation: §fx: {actor.location.block_x} §7/ §fy: {actor.location.block_y} §7/ §fz: {actor.location.block_z}
 §7- §eRotation: §fyaw: {round(actor.location.yaw, 2)} §7/ §fpitch: {round(actor.location.pitch, 2)}
 §7- §eDimension: §f{actor.dimension.name}
-§7- §eHealth: §f{actor.health}/{actor.max_health}
+§7- §eHealth: §f{health}
 §7- §eGrounded: §f{actor.is_on_ground}
 §7- §eIn Lava: §f{actor.is_in_lava}
 §7- §eIn Water: §f{actor.is_in_water}

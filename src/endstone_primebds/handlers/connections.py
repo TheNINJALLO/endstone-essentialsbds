@@ -143,8 +143,6 @@ def handle_leave_event(self: "PrimeBDS", ev: PlayerQuitEvent):
     self.db.update_user_data(ev.player.name, 'xp', ev.player.total_exp)
     self.db.update_user_data(ev.player.name, 'last_leave', int(time.time()))
     self.db.update_user_data(ev.player.name, "is_afk", 0)
-    self.db.save_inventory(ev.player)
-    self.db.save_enderchest(ev.player)
     stop_jail_check_if_not_needed(self)
 
     if ev.player.unique_id in self.vanish_state:
@@ -282,6 +280,6 @@ def check_unset_scoreboards(self):
             try:
                 with open(full_path, 'w') as f:
                     json.dump(data, f, indent=4)
-                print(f"[PrimeBDS] Updated scoreboard file '{filename}' after loading missing entries.")
+                print(f"[EssentialsBDS] Updated scoreboard file '{filename}' after loading missing entries.")
             except Exception as e:
-                print(f"[PrimeBDS] Could not save updated scoreboard file {filename}: {e}")
+                print(f"[EssentialsBDS] Could not save updated scoreboard file {filename}: {e}")

@@ -143,8 +143,8 @@ def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
     )
 
     if target:
-        #self.db.save_inventory(target)
         target.inventory.clear()
+
         air = ItemStack("minecraft:air", 1)
         target.inventory.helmet = air
         target.inventory.chestplate = air

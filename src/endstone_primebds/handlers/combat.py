@@ -21,7 +21,7 @@ def handle_damage_event(self: "PrimeBDS", ev: ActorDamageEvent):
     damage_type = getattr(damage_source, "type", None) if damage_source else None
     source_actor_tags = getattr(getattr(damage_source, "actor", None), "scoreboard_tags", []) or []
 
-    if entity.type == "minecraft:player":
+    if isinstance(entity, Player):
         if entity.id in self.isgod:
             ev.is_cancelled = True
             return

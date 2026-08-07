@@ -89,7 +89,7 @@ def check_afk(self: "PrimeBDS"):
             self.afk_cache[player.xuid]["pos"] = current_loc
 
         except Exception as e:
-            print(f"[PrimeBDS] Error in AFK check for {getattr(player, 'name', 'Unknown')}: {e}")
+            print(f"[EssentialsBDS] Error in AFK check for {getattr(player, 'name', 'Unknown')}: {e}")
 
 def start_afk_check_if_needed(self: "PrimeBDS"):
     """Start AFK interval if needed (AFK players or config says to constantly check)."""
@@ -184,12 +184,11 @@ def check_jailed(self: "PrimeBDS"):
                     f'effect "{player.name}" clear saturation'
                 )
                 player.send_message("§6You were freed from jail, time expired!")
-
-                self.db.load_inventory(player)
                 self.jail_cache[player.xuid] = {"is_jailed": False, "is_expired": False, "data": None}
 
+
         except Exception as e:
-            print(f"[PrimeBDS] Error handling player {getattr(player, 'name', 'Unknown')}: {e}")
+            print(f"[EssentialsBDS] Error handling player {getattr(player, 'name', 'Unknown')}: {e}")
 
         stop_jail_check_if_not_needed(self)
 

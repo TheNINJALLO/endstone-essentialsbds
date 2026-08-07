@@ -37,15 +37,7 @@ def preload_settings():
             "prefix": "§l§8[§c!§8] §r§e",
             "playsound": "random.toast"
         }),
-        "rtp": OrderedDict({
-            "x": 0,
-            "z": 0,
-            "min_distance": 100,
-            "radius": 1000,
-            "cost": 0,
-            "delay": 0,
-            "cooldown": 0
-        }),
+
         "permissions_manager": OrderedDict({
             "primebds": True,
             "endstone": True,
@@ -212,7 +204,7 @@ def preload_commands():
     grouped_commands = defaultdict(list)
     found_commands = set()
 
-    print("[PrimeBDS] Registering commands...")
+    print("[EssentialsBDS] Registering commands...")
 
     for root, _, _ in os.walk(commands_base_path):
         rel_path = os.path.relpath(root, commands_base_path)
@@ -257,7 +249,7 @@ def preload_commands():
 
     # Print removed commands
     if removed_commands:
-        print("\n[PrimeBDS] Removed missing commands:")
+        print("\n[EssentialsBDS] Removed missing commands:")
         for cmd in removed_commands:
             print(f"✗ {cmd}")
 
@@ -272,7 +264,7 @@ def preload_permissions():
 preload_permissions()
 preload_settings()
 preload_commands()
-print(f"\n[PrimeBDS] Loaded {len(preloaded_commands)} commands")
+print(f"\n[EssentialsBDS] Loaded {len(preloaded_commands)} commands")
 
 # ADDITIONAL DEFAULTS
 RULES_DEFAULT = [

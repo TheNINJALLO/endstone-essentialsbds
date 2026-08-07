@@ -186,9 +186,9 @@ def load_perms(self: "PrimeBDS"):
                     (first_prefix == "primebds" and primebds_enabled) or \
                     (first_prefix == "endstone" and endstone_enabled) or \
                     (first_prefix not in {"minecraft", "primebds", "endstone"} and wildcard_enabled):
-                    print(f"[PrimeBDS] {plugin_name}: Loaded {len(plugin_perm_set)} permissions")
+                    print(f"[EssentialsBDS] {plugin_name}: Loaded {len(plugin_perm_set)} permissions")
     except Exception as e:
-        print(f"[PrimeBDS] An error occured when scanning plugins... (RTTI error caused by a plugin). This will not affect permissions. However, permissions for plugins may not be listed in /permissionslist")
+        print(f"[EssentialsBDS] An error occured when scanning plugins... (RTTI error caused by a plugin). This will not affect permissions. However, permissions for plugins may not be listed in /permissionslist")
         can_count = False
 
     server_registered = {str(p.name).lower() for p in self.server.plugin_manager.permissions}
@@ -213,16 +213,16 @@ def load_perms(self: "PrimeBDS"):
 
     endstone_filtered = [perm for perm in plugin_perms if "endstone" in perm]
     if endstone_filtered:
-        print(f"[PrimeBDS] endstone: Loaded {len(endstone_filtered)} permissions")
+        print(f"[EssentialsBDS] endstone: Loaded {len(endstone_filtered)} permissions")
 
     minecraft_filtered = [perm for perm in plugin_perms if perm in {p.lower() for p in MINECRAFT_PERMISSIONS}]
-    print(f"[PrimeBDS] minecraft: Loaded {len(minecraft_filtered)} permissions")
+    print(f"[EssentialsBDS] minecraft: Loaded {len(minecraft_filtered)} permissions")
 
     if can_count:
-        print(f"[PrimeBDS] Total managed permissions: {len(MANAGED_PERMISSIONS_LIST)}")
+        print(f"[EssentialsBDS] Total managed permissions: {len(MANAGED_PERMISSIONS_LIST)}")
     else:
-        print(f"[PrimeBDS] Total managed permissions: {len(MANAGED_PERMISSIONS_LIST)}+ (Estimate)")
-        print(f"[PrimeBDS] Some permissions may be missing due to RTTI error")
+        print(f"[EssentialsBDS] Total managed permissions: {len(MANAGED_PERMISSIONS_LIST)}+ (Estimate)")
+        print(f"[EssentialsBDS] Some permissions may be missing due to RTTI error")
 
 def normalize_rank_name(rank: str) -> str:
     rank = rank.lower()

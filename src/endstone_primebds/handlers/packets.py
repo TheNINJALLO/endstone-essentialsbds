@@ -122,7 +122,7 @@ def mute_redundant_block_events(self: "PrimeBDS", ev):
     
 def handle_subclient_login(self: "PrimeBDS", ev: PacketSendEvent):
     if not self.gamerules.get("subclient"):
-        if ev.sub_client_id is not 0:
+        if ev.sub_client_id != 0:
             ev.is_cancelled = True
 
 def handle_add_player_cache(self: "PrimeBDS", ev):
@@ -143,8 +143,12 @@ def handle_add_player_cache(self: "PrimeBDS", ev):
     return
 
 def handle_laggy_sounds(self: "PrimeBDS", ev):
-    packet = minecraft_packets.LevelSoundEventPacket()
-    packet.deserialize(ev.payload)
+    try:
+        packet = minecraft_packets.LevelSoundEventPacket()
+        packet.deserialize(ev.payload)
+    except Exception:
+        return
+
     sound = packet.sound_type
 
     if (sound in (42, 259, 290, 291, 292) or sound >= 566 or sound <= 0):

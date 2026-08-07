@@ -27,7 +27,7 @@ def start_additional_servers(self: "PrimeBDS"):
     while not (os.path.exists(os.path.join(current_dir, 'plugins')) and os.path.exists(os.path.join(current_dir, 'worlds'))):
         parent_dir = os.path.dirname(current_dir)
         if parent_dir == current_dir:
-            print("[PrimeBDS] Could not locate project root containing 'plugins' and 'worlds'.")
+            print("[EssentialsBDS] Could not locate project root containing 'plugins' and 'worlds'.")
             return
         current_dir = parent_dir
 
@@ -75,7 +75,7 @@ def start_world(self: "PrimeBDS", world_key: str, settings: dict):
 
     world_plugins_dir = os.path.join(world_dir, "plugins")
     if not copy_plugins_to_world(self.root_plugins_dir, world_plugins_dir):
-        print(f"[PrimeBDS] Warning: Not all plugins copied for world '{world_key}'")
+        print(f"[EssentialsBDS] Warning: Not all plugins copied for world '{world_key}'")
 
     server_properties_path = os.path.join(world_dir, "server.properties")
     merged_props = {**self.default_props, **settings}
@@ -100,7 +100,7 @@ def start_world(self: "PrimeBDS", world_key: str, settings: dict):
         port = int(settings.get("server-port"))
     except (TypeError, ValueError):
         port = self.base_port + len(self.multiworld_processes)
-        print(f"[PrimeBDS] Invalid or missing port for '{level_name}', using fallback: {port}")
+        print(f"[EssentialsBDS] Invalid or missing port for '{level_name}', using fallback: {port}")
 
     with self.multiworld_lock:
         self.multiworld_ports[level_name] = port
@@ -131,7 +131,7 @@ def stop_world(self, world_key: str):
         if proc is None:
             continue
 
-        print(f"[PrimeBDS] Stopping world '{level_name}'")
+        print(f"[EssentialsBDS] Stopping world '{level_name}'")
         try:
             if proc.stdin:
                 try:
@@ -146,20 +146,20 @@ def stop_world(self, world_key: str):
                     proc.stdin.write("stop\n")
                     proc.stdin.flush()
                 except (BrokenPipeError, OSError) as e:
-                    print(f"[PrimeBDS] Could not send commands to '{level_name}': {e}")
+                    print(f"[EssentialsBDS] Could not send commands to '{level_name}': {e}")
                 except Exception as e:
-                    print(f"[PrimeBDS] Error writing to stdin for '{level_name}': {e}")
+                    print(f"[EssentialsBDS] Error writing to stdin for '{level_name}': {e}")
                     
             try:
                 proc.wait(timeout=5)
-                print(f"[PrimeBDS] Process for '{level_name}' stopped gracefully.")
+                print(f"[EssentialsBDS] Process for '{level_name}' stopped gracefully.")
             except subprocess.TimeoutExpired:
-                print(f"[PrimeBDS] Process for '{level_name}' did not stop in time, killing...")
+                print(f"[EssentialsBDS] Process for '{level_name}' did not stop in time, killing...")
                 proc.kill()
                 proc.wait(timeout=2)
-                print(f"[PrimeBDS] Process for '{level_name}' killed.")
+                print(f"[EssentialsBDS] Process for '{level_name}' killed.")
         except Exception as e:
-            print(f"[PrimeBDS] Error stopping process for '{level_name}': {e}")
+            print(f"[EssentialsBDS] Error stopping process for '{level_name}': {e}")
 
         # FIX: Remove from dict after processing (avoid lock contention)
         with self.multiworld_lock:
@@ -197,9 +197,9 @@ def launch_endstone_server(multiworld_base_dir: str, folder: str, level_name: st
         if process.poll() is None:
             return process
 
-        print(f"[PrimeBDS] World '{level_name}' crashed or exited early (attempt {attempt + 1}).")
+        print(f"[EssentialsBDS] World '{level_name}' crashed or exited early (attempt {attempt + 1}).")
 
-    print(f"[PrimeBDS] World '{level_name}' failed to start after {max_retries + 1} attempts.")
+    print(f"[EssentialsBDS] World '{level_name}' failed to start after {max_retries + 1} attempts.")
     return None
 
 def forward_output(stream, prefix):
@@ -231,7 +231,7 @@ def copy_plugins_to_world(root_plugins_dir, world_plugins_dir, timeout=5):
             shutil.copy2(source_path, target_path)
             expected_plugins.append(item)
         except Exception as e:
-            print(f"[PrimeBDS] Failed to copy '{item}': {e}")
+            print(f"[EssentialsBDS] Failed to copy '{item}': {e}")
 
     start = time.time()
     while time.time() - start < timeout:

@@ -33,7 +33,7 @@ def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
 
     if not args:
         sender.send_message(
-            ColorFormat.red("Usage: /punishments <player> [page] OR /punishments <player> (remove|clear)"))
+            f"{ColorFormat.RED}Usage: /punishments <player> [page] OR /punishments <player> (remove|clear)")
         return False
     
     if any("@" in arg for arg in args):

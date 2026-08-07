@@ -16,7 +16,7 @@ from endstone_primebds.commands import (
 from endstone_primebds.commands.Server.monitor import clear_all_monitor_intervals
 from endstone_primebds.commands.Misc.blockscan import clear_all_blockscan_intervals
 from endstone_primebds.utils.config_util import load_config
-from endstone_primebds.utils.economy_utils import get_eco_link
+
 from endstone_primebds.utils.db_util import UserDB, sessionDB, ServerDB, User, ModLog, ServerData
 import endstone_primebds.utils.internal_permissions_util as perms_util
 
@@ -24,14 +24,7 @@ def plugin_text():
     print(
         """
 
-██████╗░██████╗░██╗███╗░░░███╗███████╗██████╗░██████╗░░██████╗
-██╔══██╗██╔══██╗██║████╗░████║██╔════╝██╔══██╗██╔══██╗██╔════╝
-██████╔╝██████╔╝██║██╔████╔██║█████╗░░██████╦╝██║░░██║╚█████╗░
-██╔═══╝░██╔══██╗██║██║╚██╔╝██║██╔══╝░░██╔══██╗██║░░██║░╚═══██╗
-██║░░░░░██║░░██║██║██║░╚═╝░██║███████╗██████╦╝██████╔╝██████╔╝
-╚═╝░░░░░╚═╝░░╚═╝╚═╝╚═╝░░░░░╚═╝╚══════╝╚═════╝░╚═════╝░╚═════╝░                  
-
-Prime BDS Loaded!
+EssentialsBDS Loaded!
         """
     )
 
@@ -53,10 +46,9 @@ from endstone_primebds.handlers.items import handle_item_pickup_event, handle_it
 from endstone_primebds.handlers.gamerules import handle_bed_enter_event, handle_emote_event, handle_leaves_decay_event, handle_skin_change_event
 
 class PrimeBDS(Plugin):
-    api_version = "0.10"
+    api_version = "0.11"
     authors = ["PrimeStrat"]
     description = "An essentials plugin for diagnostics, stability, and quality of life on Minecraft Bedrock Edition."
-    website = "https://github.com/PrimeStrat/primebds"
     
     commands = preloaded_commands
     permissions = preloaded_permissions
@@ -189,14 +181,8 @@ class PrimeBDS(Plugin):
 
     @event_handler()
     def on_server_load(self, ev: ServerLoadEvent):
-        eco = get_eco_link(self)
-        if eco:
-            name = perms_util.get_permission_header(eco)
-            print(f"[PrimeBDS] Successfully linked economy plugin: {name}")
-        else:
-            print(f"[PrimeBDS] Did NOT link to an economy plugin... warps will ignore cost")
-
         self.server.scheduler.run_task(self, perms_util.load_perms(self), 1)
+
         for player in self.server.online_players:
             self.server.scheduler.run_task(self, self.reload_custom_perms(player), 1)
 

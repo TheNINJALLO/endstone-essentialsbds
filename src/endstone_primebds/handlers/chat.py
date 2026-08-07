@@ -38,28 +38,32 @@ def handle_chat_event(self: "PrimeBDS", ev: PlayerChatEvent):
     config = load_config()
     user = self.db.get_online_user(ev.player.xuid)
 
+    server_messages = config.get("modules", {}).get("server_messages", {})
+
     if user.enabled_sc:
         safe_message = ev.message.replace("{", "{{").replace("}", "}}")
-        message = f"{config['modules']['server_messages']['staff_chat_prefix']}§e{ev.player.name}§7: §6{safe_message}"
+        sc_prefix = server_messages.get("staff_chat_prefix", "§8[§bSC§8] ")
+        message = f"{sc_prefix}§e{ev.player.name}§7: §6{safe_message}"
         self.server.broadcast(message, "primebds.command.staffchat")
         ev.is_cancelled = True
         return False
     
-    enhanced_chat = config["modules"]["server_messages"]["enhanced_chat"]
-    chat_cooldown = config["modules"]["server_messages"]["chat_cooldown"]
+    enhanced_chat = server_messages.get("enhanced_chat", False)
+    chat_cooldown = server_messages.get("chat_cooldown", 0)
 
     current_time = time()
     last_chat_time = self.chat_cooldown.get(ev.player.id, 0)
     time_since_last = current_time - last_chat_time
     time_remaining = chat_cooldown - time_since_last
 
-    if time_since_last >= chat_cooldown:
-        self.chat_cooldown[ev.player.id] = current_time
-    else:
-        ev.player.send_message(f"§cYou must wait {time_remaining:.2f}s before chatting again!")
-        ev.is_cancelled = True
+    if chat_cooldown > 0:
+        if time_since_last >= chat_cooldown:
+            self.chat_cooldown[ev.player.id] = current_time
+        else:
+            ev.player.send_message(f"§cYou must wait {time_remaining:.2f}s before chatting again!")
+            ev.is_cancelled = True
 
-    if enhanced_chat :
+    if enhanced_chat:
         def escape_braces(s: str) -> str:
             return s.replace("{", "{{").replace("}", "}}")
 
@@ -67,7 +71,7 @@ def handle_chat_event(self: "PrimeBDS", ev: PlayerChatEvent):
         suffix = escape_braces(perms_util.get_suffix(user.internal_rank, perms_util.PERMISSIONS))
         name_tag = escape_braces(ev.player.name_tag)
         safe_msg = escape_braces(ev.message)
-        chat_prefix = escape_braces(config['modules']['server_messages']['chat_prefix'])
+        chat_prefix = escape_braces(server_messages.get("chat_prefix", "§7: "))
         ev.format = f"{prefix}{name_tag}{suffix}{chat_prefix}§r{safe_msg}"
 
     discordRelay(f"**{ev.player.name}**: {ev.message}", "chat")
