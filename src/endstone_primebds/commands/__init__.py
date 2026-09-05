@@ -39,7 +39,7 @@ def preload_settings():
         }),
 
         "permissions_manager": OrderedDict({
-            "primebds": True,
+            "onistone": True,
             "endstone": True,
             "minecraft": True,
             "*": True
@@ -193,7 +193,7 @@ def preload_settings():
             print(f"Failed to save config.json: {e}. Existing file left untouched.")
 
 def preload_commands():
-    """Preload all command modules before PrimeBDS is instantiated, respecting the config."""
+    """Preload all command modules before OnistoneEssentials is instantiated, respecting the config."""
     global preloaded_commands, preloaded_permissions, preloaded_handlers
 
     commands_base_path = os.path.join(os.path.dirname(endstone_primebds.__file__), 'commands')
@@ -204,7 +204,7 @@ def preload_commands():
     grouped_commands = defaultdict(list)
     found_commands = set()
 
-    print("[EssentialsBDS] Registering commands...")
+    print("[Onistone Essentials] Registering commands...")
 
     for root, _, _ in os.walk(commands_base_path):
         rel_path = os.path.relpath(root, commands_base_path)
@@ -244,14 +244,14 @@ def preload_commands():
             clean_category = category.replace("_", " ") if category else "Root"
             print(f"\n[{clean_category}]")
             for cmd, desc in commands:
-                status = "✓" if "Disabled by config" not in desc else "✗"
+                status = "[ON]" if "Disabled by config" not in desc else "[OFF]"
                 print(f"{status} {cmd} - {desc}")
 
     # Print removed commands
     if removed_commands:
-        print("\n[EssentialsBDS] Removed missing commands:")
+        print("\n[Onistone Essentials] Removed missing commands:")
         for cmd in removed_commands:
-            print(f"✗ {cmd}")
+            print(f"[REMOVED] {cmd}")
 
     print("\n")
     save_cmd_config(config)
@@ -264,7 +264,7 @@ def preload_permissions():
 preload_permissions()
 preload_settings()
 preload_commands()
-print(f"\n[EssentialsBDS] Loaded {len(preloaded_commands)} commands")
+print(f"\n[Onistone Essentials] Loaded {len(preloaded_commands)} commands")
 
 # ADDITIONAL DEFAULTS
 RULES_DEFAULT = [

@@ -1,3 +1,3 @@
-from endstone_primebds.primebds import PrimeBDS
+from endstone_primebds.primebds import OnistoneEssentials
 
-__all__ = ["PrimeBDS"]
+__all__ = ["OnistoneEssentials"]

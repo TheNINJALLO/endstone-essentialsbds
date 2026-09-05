@@ -4,10 +4,10 @@ build-backend = "hatchling.build"
 
 [project]
 name = "endstone-essentialsbds"
-version = "3.4.5"
+version = "3.5.0"
 description = "An essentials plugin for diagnostics, stability, and quality of life on Minecraft Bedrock Edition."
 requires-python = ">=3.10"
-author = "PrimeStrat"
+author = "Onistone"
 dependencies = [
     "endstone>=0.11.9,<0.12",
     "bedrock-protocol-packets-ng>=0.0.9",
@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.entry-points."endstone"]
-essentialsbds = "endstone_primebds:PrimeBDS"
+onistone_essentials = "endstone_primebds:OnistoneEssentials"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/endstone_primebds"]

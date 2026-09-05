@@ -2,7 +2,7 @@ from endstone import Player
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 """
 class AddPlayerPacket(Packet): # CURRENTLY BUGGED
@@ -156,12 +156,12 @@ def extract_player_name_from_addplayer(packet: bytes):
     player_name, _ = read_string(packet, pos)
     return player_name
 
-def cache_add_player_packet(self: "PrimeBDS", player: Player, packet: bytes):
+def cache_add_player_packet(self: "OnistoneEssentials", player: Player, packet: bytes):
     """Cache player packet in memory and update DB."""
     player_packet_cache[player.xuid] = packet
     self.db.update_user_data(player.name, "last_vanish_blob", packet)
 
-def return_cached_add_player_packet(self: "PrimeBDS", player: Player) -> bytes:
+def return_cached_add_player_packet(self: "OnistoneEssentials", player: Player) -> bytes:
     """Return packet from memory cache, fallback to DB if missing."""
     if player.xuid in player_packet_cache:
         return player_packet_cache[player.xuid]

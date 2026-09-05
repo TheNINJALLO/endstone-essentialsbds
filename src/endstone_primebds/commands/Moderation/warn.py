@@ -11,17 +11,17 @@ from endstone_primebds.utils.logging_util import log
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
     "warn",
     "Warn a player that they are breaking a rule!",
     ["/warn <player: player> <reason: string> [duration_number: int] (second|minute|hour|day|week|month|year)[duration_length: warn_length]"],
-    ["primebds.command.warn"]
+    ["onistone.command.warn"]
 )
 
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if BlockCommandSender is not None and isinstance(sender, BlockCommandSender):
        sender.send_message("§cThis command cannot be automated")
        return False

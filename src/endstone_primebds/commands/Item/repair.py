@@ -5,18 +5,18 @@ from endstone_primebds.utils.target_selector_util import get_matching_actors
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
     "repair",
     "Repairs the item in hand!",
     ["/repair [player: player]"],
-    ["primebds.command.repair", "primebds.command.repair.other"]
+    ["onistone.command.repair", "onistone.command.repair.other"]
 )
 
 # REPAIR COMMAND FUNCTIONALITY
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if len(args) == 0:
         if not isinstance(sender, Player):
             sender.send_message("§cThis command can only be executed by a player")
@@ -35,7 +35,7 @@ def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
         sender.send_message("§aYour held item was repaired")
         return True
 
-    if not sender.has_permission("primebds.command.repair.other"):
+    if not sender.has_permission("onistone.command.repair.other"):
         sender.send_message("§cYou do not have permission to repair others' items")
         return True
 

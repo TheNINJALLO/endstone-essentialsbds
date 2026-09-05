@@ -5,7 +5,7 @@ from endstone_primebds.utils.config_util import load_permissions, load_config
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 RANKS = list(load_permissions().keys())
 PERMISSIONS = load_permissions()
@@ -93,28 +93,28 @@ MINECRAFT_PERMISSIONS = [
 ]
 
 EXTRA_PERMS = [
-    "primebds.exempt.msgtoggle",
-    "primebds.exempt.globalmute",
-    "primebds.exempt.mute",
-    "primebds.exempt.ban",
-    "primebds.exempt.kick",
-    "primebds.exempt.warn",
-    "primebds.exempt.jail",
-    "primebds.exempt.homes",
-    "primebds.exempt.homes.other",
-    "primebds.exempt.home.delays",
-    "primebds.exempt.home.cooldowns",
-    "primebds.exempt.warp.delays",
-    "primebds.exempt.warp.cooldowns",
-    "primebds.exempt.spawn.delays",
-    "primebds.exempt.spawn.cooldowns",
-    "primebds.exempt.back.delays",
-    "primebds.exempt.back.cooldowns",
-    "primebds.command.heal.other",
-    "primebds.command.feed.other",
-    "primebds.command.repair.other",
-    "primebds.command.god.other",
-    "primebds.command.hat.other"
+    "onistone.exempt.msgtoggle",
+    "onistone.exempt.globalmute",
+    "onistone.exempt.mute",
+    "onistone.exempt.ban",
+    "onistone.exempt.kick",
+    "onistone.exempt.warn",
+    "onistone.exempt.jail",
+    "onistone.exempt.homes",
+    "onistone.exempt.homes.other",
+    "onistone.exempt.home.delays",
+    "onistone.exempt.home.cooldowns",
+    "onistone.exempt.warp.delays",
+    "onistone.exempt.warp.cooldowns",
+    "onistone.exempt.spawn.delays",
+    "onistone.exempt.spawn.cooldowns",
+    "onistone.exempt.back.delays",
+    "onistone.exempt.back.cooldowns",
+    "onistone.command.heal.other",
+    "onistone.command.feed.other",
+    "onistone.command.repair.other",
+    "onistone.command.god.other",
+    "onistone.command.hat.other"
 ]
 
 def reload_rank_list():
@@ -124,12 +124,12 @@ def reload_rank_list():
 def get_ranks() -> list[str]:
     return RANKS
 
-def load_perms(self: "PrimeBDS"):
+def load_perms(self: "OnistoneEssentials"):
     config = load_config()
     modules = config.get("modules", {})
     perms_manager = modules.get("permissions_manager", {})
     minecraft_enabled = perms_manager.get("minecraft", True)
-    primebds_enabled = perms_manager.get("primebds", True)
+    onistone_enabled = perms_manager.get("onistone", True)
     endstone_enabled = perms_manager.get("endstone", True)
     wildcard_enabled = perms_manager.get("*", True)
 
@@ -154,9 +154,9 @@ def load_perms(self: "PrimeBDS"):
 
                     prefix = perm_lower.split(".")[0]
                     if (prefix == "minecraft" and minecraft_enabled) or \
-                    (prefix == "primebds" and primebds_enabled) or \
+                    (prefix == "onistone" and onistone_enabled) or \
                     (prefix == "endstone" and endstone_enabled) or \
-                    (prefix not in {"minecraft", "primebds", "endstone"} and wildcard_enabled):
+                    (prefix not in {"minecraft", "onistone", "endstone"} and wildcard_enabled):
                         plugin_perms.add(perm_lower)
                         plugin_perm_set.add(perm_lower)
             elif commands and wildcard_enabled:
@@ -167,13 +167,18 @@ def load_perms(self: "PrimeBDS"):
                         plugin_perms.add(perm_lower)
                         plugin_perm_set.add(perm_lower)
 
-            if getattr(plugin, "name", "") == "primebds":
+            if getattr(plugin, "name", "").lower() in {
+                "essentialsbds",
+                "onistone",
+                "onistoneessentials",
+                "onistone essentials",
+            }:
                 for perm in EXTRA_PERMS:
                     plugin_perms.add(perm)
                     plugin_perm_set.add(perm)
 
             plugin_name = getattr(plugin, "name", None)
-            if plugin_name == None:
+            if plugin_name is None:
                 if plugin_perm_set:
                     first_perm = next(iter(plugin_perm_set))
                     plugin_name = first_perm.split(".")[0]
@@ -183,12 +188,12 @@ def load_perms(self: "PrimeBDS"):
             if plugin_perm_set:
                 first_prefix = next(iter(plugin_perm_set)).split(".")[0]
                 if (first_prefix == "minecraft" and minecraft_enabled) or \
-                    (first_prefix == "primebds" and primebds_enabled) or \
+                    (first_prefix == "onistone" and onistone_enabled) or \
                     (first_prefix == "endstone" and endstone_enabled) or \
-                    (first_prefix not in {"minecraft", "primebds", "endstone"} and wildcard_enabled):
-                    print(f"[EssentialsBDS] {plugin_name}: Loaded {len(plugin_perm_set)} permissions")
-    except Exception as e:
-        print(f"[EssentialsBDS] An error occured when scanning plugins... (RTTI error caused by a plugin). This will not affect permissions. However, permissions for plugins may not be listed in /permissionslist")
+                    (first_prefix not in {"minecraft", "onistone", "endstone"} and wildcard_enabled):
+                    print(f"[Onistone Essentials] {plugin_name}: Loaded {len(plugin_perm_set)} permissions")
+    except Exception:
+        print("[Onistone Essentials] An error occured when scanning plugins... (RTTI error caused by a plugin). This will not affect permissions. However, permissions for plugins may not be listed in /permissionslist")
         can_count = False
 
     server_registered = {str(p.name).lower() for p in self.server.plugin_manager.permissions}
@@ -196,7 +201,7 @@ def load_perms(self: "PrimeBDS"):
     for perm in server_registered:
         prefix = perm.split(".")[0]
         if (prefix == "minecraft" and minecraft_enabled) or \
-        (prefix == "primebds" and primebds_enabled) or \
+        (prefix == "onistone" and onistone_enabled) or \
         (prefix == "endstone" and endstone_enabled) or \
         (prefix not in {"minecraft", "endstone"} and wildcard_enabled):
             plugin_perms.add(perm)
@@ -208,26 +213,26 @@ def load_perms(self: "PrimeBDS"):
     MANAGED_PERMISSIONS_LIST.extend(plugin_perms)
 
     for perm in EXTRA_PERMS:
-        if perm not in MANAGED_PERMISSIONS_LIST and primebds_enabled:
+        if perm not in MANAGED_PERMISSIONS_LIST and onistone_enabled:
             MANAGED_PERMISSIONS_LIST.append(perm)
 
     endstone_filtered = [perm for perm in plugin_perms if "endstone" in perm]
     if endstone_filtered:
-        print(f"[EssentialsBDS] endstone: Loaded {len(endstone_filtered)} permissions")
+        print(f"[Onistone Essentials] endstone: Loaded {len(endstone_filtered)} permissions")
 
     minecraft_filtered = [perm for perm in plugin_perms if perm in {p.lower() for p in MINECRAFT_PERMISSIONS}]
-    print(f"[EssentialsBDS] minecraft: Loaded {len(minecraft_filtered)} permissions")
+    print(f"[Onistone Essentials] minecraft: Loaded {len(minecraft_filtered)} permissions")
 
     if can_count:
-        print(f"[EssentialsBDS] Total managed permissions: {len(MANAGED_PERMISSIONS_LIST)}")
+        print(f"[Onistone Essentials] Total managed permissions: {len(MANAGED_PERMISSIONS_LIST)}")
     else:
-        print(f"[EssentialsBDS] Total managed permissions: {len(MANAGED_PERMISSIONS_LIST)}+ (Estimate)")
-        print(f"[EssentialsBDS] Some permissions may be missing due to RTTI error")
+        print(f"[Onistone Essentials] Total managed permissions: {len(MANAGED_PERMISSIONS_LIST)}+ (Estimate)")
+        print("[Onistone Essentials] Some permissions may be missing due to RTTI error")
 
 def normalize_rank_name(rank: str) -> str:
     rank = rank.lower()
-    if rank.startswith("primebds.rank."):
-        rank = rank[len("primebds.rank."):]
+    if rank.startswith("onistone.rank."):
+        rank = rank[len("onistone.rank."):]
 
     for r in RANKS:
         if r.lower() == rank:
@@ -242,7 +247,7 @@ def get_rank_group(rank_name: str) -> dict | None:
             return value
     return None
 
-def check_rank_exists(self: "PrimeBDS", target: Player, rank: str) -> str:
+def check_rank_exists(self: "OnistoneEssentials", target: Player, rank: str) -> str:
     """Ensure a rank exists; fallback to Default if missing or invalid. Case-insensitive."""
     try:
         ranks_map = {r.lower(): r for r in PERMISSIONS.keys()}
@@ -335,7 +340,7 @@ def get_rank_permissions(rank: str) -> dict[str, bool]:
     return result
 
 perm_cache = {}
-def check_perms(self: "PrimeBDS", player_or_user, perm: str, check_rank=False) -> bool:
+def check_perms(self: "OnistoneEssentials", player_or_user, perm: str, check_rank=False) -> bool:
     now = time.time()
     xuid = getattr(player_or_user, "xuid", None)
 

@@ -1,4 +1,4 @@
-import re
+from endstone import Player
 from endstone.command import CommandSender
 try:
     from endstone.command import BlockCommandSender
@@ -11,12 +11,14 @@ from endstone_primebds.utils.config_util import load_permissions, save_permissio
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 command, permission = create_command(
     "rank",
     "Sets the internal rank for a player!",
     [
+        "/rank",
+        "/rank (gui)<rank_gui: rank_gui>",
         "/rank (set)<rank_set: rank_set> <player: player> <rank: string>",
         "/rank (prefix|suffix)<rank_meta: rank_meta> <rank: string> <meta: message>",
         "/rank (perm)<rank_perm: rank_perm> (add|remove)<perm_action: perm_action> <rank: string> <perm: string> [state: bool]",
@@ -24,18 +26,29 @@ command, permission = create_command(
         "/rank (inherit)<rank_inherit: rank_inherit> <rank_child: string> <rank_parent: string>",
         "/rank (create|delete|list|info)<rank_action: rank_action> [rank: message]"
     ],
-    ["primebds.command.rank"]
+    ["onistone.command.rank"]
 )
 
 # RANK COMMAND FUNCTIONALITY
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if BlockCommandSender is not None and isinstance(sender, BlockCommandSender):
        sender.send_message("§cThis command cannot be automated")
        return False
 
     if any("@" in arg for arg in args):
-        sender.send_message(f"§cTarget selectors are invalid for this command")
+        sender.send_message("§cTarget selectors are invalid for this command")
         return False
+
+    if not args or args[0].lower() == "gui":
+        if not isinstance(sender, Player):
+            sender.send_message("This GUI can only be opened by a player.")
+            return False
+        from endstone_primebds.commands.Server.permission_manager_gui import (
+            open_permissions_manager,
+        )
+
+        open_permissions_manager(self, sender)
+        return True
 
     target = args[1] if len(args) > 1 else None
     subaction = args[0].lower()
@@ -119,7 +132,7 @@ def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
 
         actual_rank = find_rank(rank_name, perms)
         if actual_rank == "Default" or actual_rank == "Operator":
-            sender.send_message(f"§cThis rank cannot be deleted")
+            sender.send_message("§cThis rank cannot be deleted")
             return False
 
         del perms[actual_rank]
@@ -131,7 +144,7 @@ def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
 
     elif subaction == "info":
         if len(args) < 2:
-            sender.send_message(f"§cYou must specify a rank")
+            sender.send_message("§cYou must specify a rank")
             return False
         rank_name = args[1].lower()
 
@@ -307,7 +320,7 @@ def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
 
     return True
 
-def updatePermissionsFiltered(self: "PrimeBDS", affected_ranks: set):
+def updatePermissionsFiltered(self: "OnistoneEssentials", affected_ranks: set):
     """Reload permissions only for players whose rank is in affected_ranks"""
     for player in self.server.online_players:
         user_data = self.db.get_online_user(player.xuid)

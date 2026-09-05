@@ -6,23 +6,23 @@ from endstone_primebds.utils.intervals_util import IntervalManager
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 import threading
 
-def init_intervals(self: "PrimeBDS"):
+def init_intervals(self: "OnistoneEssentials"):
     """Actual interval setup, safe to run in its own thread."""
     setup_intervals(self)
     start_jail_check_if_needed(self)
     start_afk_check_if_needed(self)
 
-def setup_intervals(self: "PrimeBDS"):
+def setup_intervals(self: "OnistoneEssentials"):
     """Prepare system, but don't start it until needed."""
     self.interval_manager = IntervalManager(self, tick_interval=20)
     self.interval_manager.add_check(check_jailed)
     self.interval_manager.add_check(check_afk)
 
-def init_afk_intervals(self: "PrimeBDS"):
+def init_afk_intervals(self: "OnistoneEssentials"):
     """Initialize AFK interval system in a separate thread."""
     def worker():
         setup_afk_intervals(self)
@@ -30,12 +30,12 @@ def init_afk_intervals(self: "PrimeBDS"):
     t = threading.Thread(target=worker, name="AfkIntervalInit")
     t.start()
 
-def setup_afk_intervals(self: "PrimeBDS"):
+def setup_afk_intervals(self: "OnistoneEssentials"):
     """Prepare AFK check system but don't start it until needed."""
     self.afk_interval_manager = IntervalManager(self, tick_interval=20)
     self.afk_interval_manager.add_check(check_afk)
 
-def check_afk(self: "PrimeBDS"):
+def check_afk(self: "OnistoneEssentials"):
     """Check and handle player AFK states and auto-detection."""
     config = load_config()
     auto_detect = config["modules"]["afk"]["constantly_check_afk_status"]
@@ -89,9 +89,9 @@ def check_afk(self: "PrimeBDS"):
             self.afk_cache[player.xuid]["pos"] = current_loc
 
         except Exception as e:
-            print(f"[EssentialsBDS] Error in AFK check for {getattr(player, 'name', 'Unknown')}: {e}")
+            print(f"[Onistone Essentials] Error in AFK check for {getattr(player, 'name', 'Unknown')}: {e}")
 
-def start_afk_check_if_needed(self: "PrimeBDS"):
+def start_afk_check_if_needed(self: "OnistoneEssentials"):
     """Start AFK interval if needed (AFK players or config says to constantly check)."""
     def main_thread_check():
         config = load_config()
@@ -106,7 +106,7 @@ def start_afk_check_if_needed(self: "PrimeBDS"):
 
     self.server.scheduler.run_task(self, main_thread_check, 0)
 
-def stop_afk_check_if_not_needed(self: "PrimeBDS"):
+def stop_afk_check_if_not_needed(self: "OnistoneEssentials"):
     """Stop AFK interval if no one is AFK and config doesn't require constant checking."""
     config = load_config()
     auto_detect = config["modules"]["afk"]["constantly_check_afk_status"]
@@ -118,7 +118,7 @@ def stop_afk_check_if_not_needed(self: "PrimeBDS"):
         if getattr(self.afk_interval_manager, "_task_id", None):
             self.afk_interval_manager.stop()
 
-def init_jail_intervals(self: "PrimeBDS"):
+def init_jail_intervals(self: "OnistoneEssentials"):
     """Initialize the jail interval system in a separate thread."""
     def worker():
         init_intervals(self)
@@ -126,7 +126,7 @@ def init_jail_intervals(self: "PrimeBDS"):
     t = threading.Thread(target=worker, name="JailIntervalInit")
     t.start()
 
-def refresh_jail_cache(self: "PrimeBDS", player):
+def refresh_jail_cache(self: "OnistoneEssentials", player):
     """Update jail cache from DB only when needed."""
     is_jailed, is_expired = self.db.check_jailed(player.xuid)
     if is_jailed:
@@ -139,7 +139,7 @@ def refresh_jail_cache(self: "PrimeBDS", player):
     else:
         self.jail_cache[player.xuid] = {"is_jailed": False, "is_expired": False, "data": None}
 
-def start_jail_check_if_needed(self: "PrimeBDS"):
+def start_jail_check_if_needed(self: "OnistoneEssentials"):
     """Run this on the main tick scheduler to avoid threading issues."""
     def main_thread_check():
         if any(self.db.check_jailed(p.xuid)[0] for p in self.server.online_players):
@@ -147,13 +147,13 @@ def start_jail_check_if_needed(self: "PrimeBDS"):
                 self.interval_manager.start()
     self.server.scheduler.run_task(self, main_thread_check, 0)
 
-def stop_jail_check_if_not_needed(self: "PrimeBDS"):
+def stop_jail_check_if_not_needed(self: "OnistoneEssentials"):
     """Stop interval if no online player is jailed."""
     if not any(self.db.check_jailed(p.xuid)[0] for p in self.server.online_players):
         if getattr(self.interval_manager, "_task_id", None):
             self.interval_manager.stop()
 
-def check_jailed(self: "PrimeBDS"):
+def check_jailed(self: "OnistoneEssentials"):
     """Handle players whose jail time has expired."""
     for player in self.server.online_players:
         try:
@@ -188,16 +188,16 @@ def check_jailed(self: "PrimeBDS"):
 
 
         except Exception as e:
-            print(f"[EssentialsBDS] Error handling player {getattr(player, 'name', 'Unknown')}: {e}")
+            print(f"[Onistone Essentials] Error handling player {getattr(player, 'name', 'Unknown')}: {e}")
 
         stop_jail_check_if_not_needed(self)
 
-def stop_intervals(self: "PrimeBDS"):
+def stop_intervals(self: "OnistoneEssentials"):
     """Stop all periodic checks safely (on shutdown)."""
     if hasattr(self, "interval_manager"):
         self.interval_manager.stop()
 
-def recheck_all_intervals(self: "PrimeBDS"):
+def recheck_all_intervals(self: "OnistoneEssentials"):
     """
     Re-evaluate whether AFK and Jail intervals should be running.
     Call this after config reloads or any mid-game setting changes.

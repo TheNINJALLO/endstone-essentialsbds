@@ -24,7 +24,7 @@ def plugin_text():
     print(
         """
 
-EssentialsBDS Loaded!
+Onistone Essentials Loaded!
         """
     )
 
@@ -45,9 +45,9 @@ from endstone_primebds.handlers.actions import handle_gamemode_event, handle_int
 from endstone_primebds.handlers.items import handle_item_pickup_event, handle_item_use, handle_item_drop_event
 from endstone_primebds.handlers.gamerules import handle_bed_enter_event, handle_emote_event, handle_leaves_decay_event, handle_skin_change_event
 
-class PrimeBDS(Plugin):
+class OnistoneEssentials(Plugin):
     api_version = "0.11"
-    authors = ["PrimeStrat"]
+    authors = ["Onistone"]
     description = "An essentials plugin for diagnostics, stability, and quality of life on Minecraft Bedrock Edition."
     
     commands = preloaded_commands
@@ -266,20 +266,20 @@ class PrimeBDS(Plugin):
 
         linked_groups = [
             [
-                "primebds.command.permban",
+                "onistone.command.permban",
                 "endstone.command.ban",
             ],
             [
-                "primebds.command.ipban",
+                "onistone.command.ipban",
                 "endstone.command.banip"
             ],
             [
-                "primebds.command.removeban",
+                "onistone.command.removeban",
                 "endstone.command.unban",
                 "endstone.command.unbanip",
             ],
             [
-                "primebds.command.filterlist",
+                "onistone.command.filterlist",
                 "endstone.command.banlist"
             ]
         ]
@@ -323,13 +323,13 @@ class PrimeBDS(Plugin):
 
         to_remove = [
             attinfo.attachment for attinfo in player.effective_permissions
-            if attinfo.permission == "primebdsoverride"
+            if attinfo.permission == "onistoneoverride"
         ]
         for attachment in to_remove:
             attachment.remove()
 
         perms_to_apply = list(final_permissions.items())
-        attachment = player.add_attachment(self, "primebdsoverride", True)
+        attachment = player.add_attachment(self, "onistoneoverride", True)
 
         plugin_stars = {}
         internal = {"minecraft", "minecraft.command", "endstone", "endstone.command"}

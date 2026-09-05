@@ -7,13 +7,19 @@ import threading
 import time
 
 import psutil
-from endstone_primebds.utils.config_util import find_and_load_config, load_config, save_properties_file, parse_properties_file
+from endstone_primebds.utils.config_util import (
+    CONFIG_FOLDER,
+    find_and_load_config,
+    load_config,
+    save_properties_file,
+    parse_properties_file,
+)
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
-def start_additional_servers(self: "PrimeBDS"):
+def start_additional_servers(self: "OnistoneEssentials"):
     config = load_config()
     multiworld = config["modules"].get("multiworld", {})
     worlds = {name: cfg for name, cfg in multiworld.get("worlds", {}).items() if cfg.get("enabled", False)}
@@ -27,11 +33,11 @@ def start_additional_servers(self: "PrimeBDS"):
     while not (os.path.exists(os.path.join(current_dir, 'plugins')) and os.path.exists(os.path.join(current_dir, 'worlds'))):
         parent_dir = os.path.dirname(current_dir)
         if parent_dir == current_dir:
-            print("[EssentialsBDS] Could not locate project root containing 'plugins' and 'worlds'.")
+            print("[Onistone Essentials] Could not locate project root containing 'plugins' and 'worlds'.")
             return
         current_dir = parent_dir
 
-    db_folder = os.path.join(current_dir, 'plugins', 'primebds_data')
+    db_folder = CONFIG_FOLDER
     self.multiworld_base_dir = os.path.join(db_folder, "multiworld")
     self.root_plugins_dir = os.path.join(current_dir, "plugins")
     self.seen_level_names = {}
@@ -50,7 +56,7 @@ def start_additional_servers(self: "PrimeBDS"):
             daemon=True
         ).start()
 
-def stop_additional_servers(self: "PrimeBDS"):
+def stop_additional_servers(self: "OnistoneEssentials"):
     threads = []
 
     # FIX: Changed from .items() to .keys() to get level names, not tuples
@@ -64,7 +70,7 @@ def stop_additional_servers(self: "PrimeBDS"):
 
     self.multiworld_processes.clear()
     
-def start_world(self: "PrimeBDS", world_key: str, settings: dict):
+def start_world(self: "OnistoneEssentials", world_key: str, settings: dict):
     """Start a single configured world."""
     if world_key == self.server.level.name:
         return
@@ -75,7 +81,7 @@ def start_world(self: "PrimeBDS", world_key: str, settings: dict):
 
     world_plugins_dir = os.path.join(world_dir, "plugins")
     if not copy_plugins_to_world(self.root_plugins_dir, world_plugins_dir):
-        print(f"[EssentialsBDS] Warning: Not all plugins copied for world '{world_key}'")
+        print(f"[Onistone Essentials] Warning: Not all plugins copied for world '{world_key}'")
 
     server_properties_path = os.path.join(world_dir, "server.properties")
     merged_props = {**self.default_props, **settings}
@@ -100,7 +106,7 @@ def start_world(self: "PrimeBDS", world_key: str, settings: dict):
         port = int(settings.get("server-port"))
     except (TypeError, ValueError):
         port = self.base_port + len(self.multiworld_processes)
-        print(f"[EssentialsBDS] Invalid or missing port for '{level_name}', using fallback: {port}")
+        print(f"[Onistone Essentials] Invalid or missing port for '{level_name}', using fallback: {port}")
 
     with self.multiworld_lock:
         self.multiworld_ports[level_name] = port
@@ -131,7 +137,7 @@ def stop_world(self, world_key: str):
         if proc is None:
             continue
 
-        print(f"[EssentialsBDS] Stopping world '{level_name}'")
+        print(f"[Onistone Essentials] Stopping world '{level_name}'")
         try:
             if proc.stdin:
                 try:
@@ -146,20 +152,20 @@ def stop_world(self, world_key: str):
                     proc.stdin.write("stop\n")
                     proc.stdin.flush()
                 except (BrokenPipeError, OSError) as e:
-                    print(f"[EssentialsBDS] Could not send commands to '{level_name}': {e}")
+                    print(f"[Onistone Essentials] Could not send commands to '{level_name}': {e}")
                 except Exception as e:
-                    print(f"[EssentialsBDS] Error writing to stdin for '{level_name}': {e}")
+                    print(f"[Onistone Essentials] Error writing to stdin for '{level_name}': {e}")
                     
             try:
                 proc.wait(timeout=5)
-                print(f"[EssentialsBDS] Process for '{level_name}' stopped gracefully.")
+                print(f"[Onistone Essentials] Process for '{level_name}' stopped gracefully.")
             except subprocess.TimeoutExpired:
-                print(f"[EssentialsBDS] Process for '{level_name}' did not stop in time, killing...")
+                print(f"[Onistone Essentials] Process for '{level_name}' did not stop in time, killing...")
                 proc.kill()
                 proc.wait(timeout=2)
-                print(f"[EssentialsBDS] Process for '{level_name}' killed.")
+                print(f"[Onistone Essentials] Process for '{level_name}' killed.")
         except Exception as e:
-            print(f"[EssentialsBDS] Error stopping process for '{level_name}': {e}")
+            print(f"[Onistone Essentials] Error stopping process for '{level_name}': {e}")
 
         # FIX: Remove from dict after processing (avoid lock contention)
         with self.multiworld_lock:
@@ -178,7 +184,9 @@ def stop_world(self, world_key: str):
                     continue
 
 def is_nested_multiworld_instance():
-    return "plugins{}primebds_data{}multiworld".format(os.sep, os.sep) in os.path.abspath(__file__)
+    return "plugins{}onistone_essentials{}multiworld".format(
+        os.sep, os.sep
+    ) in os.path.abspath(__file__)
 
 def launch_endstone_server(multiworld_base_dir: str, folder: str, level_name: str, max_retries: int = 3):
     """Launch an Endstone server with retry logic."""
@@ -197,9 +205,9 @@ def launch_endstone_server(multiworld_base_dir: str, folder: str, level_name: st
         if process.poll() is None:
             return process
 
-        print(f"[EssentialsBDS] World '{level_name}' crashed or exited early (attempt {attempt + 1}).")
+        print(f"[Onistone Essentials] World '{level_name}' crashed or exited early (attempt {attempt + 1}).")
 
-    print(f"[EssentialsBDS] World '{level_name}' failed to start after {max_retries + 1} attempts.")
+    print(f"[Onistone Essentials] World '{level_name}' failed to start after {max_retries + 1} attempts.")
     return None
 
 def forward_output(stream, prefix):
@@ -231,7 +239,7 @@ def copy_plugins_to_world(root_plugins_dir, world_plugins_dir, timeout=5):
             shutil.copy2(source_path, target_path)
             expected_plugins.append(item)
         except Exception as e:
-            print(f"[EssentialsBDS] Failed to copy '{item}': {e}")
+            print(f"[Onistone Essentials] Failed to copy '{item}': {e}")
 
     start = time.time()
     while time.time() - start < timeout:

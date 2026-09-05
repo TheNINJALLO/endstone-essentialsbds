@@ -9,7 +9,7 @@ from endstone.actor import Actor
 from endstone.util import Vector
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 MAX_CACHE_BYTES = 2 * 1024 * 1024 
 selector_cache = OrderedDict()
@@ -242,7 +242,7 @@ def passes_filters(players: List[object], args: dict, origin: Optional[object] =
 
     return mask
 
-def get_matching_actors(self: "PrimeBDS", selector: str, origin):
+def get_matching_actors(self: "OnistoneEssentials", selector: str, origin):
     all_actors = [a for a in self.server.online_players if isinstance(a, Player)]
 
     if not selector.startswith("@"):

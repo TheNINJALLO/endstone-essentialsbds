@@ -7,16 +7,16 @@ import re
 from endstone_primebds.utils.config_util import load_config
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 import threading
 
 TOGGLE_PERMISSIONS = {
-    "enabled_ms": "primebds.command.modspy",
-    "enabled_as": "primebds.command.altspy",
+    "enabled_ms": "onistone.command.modspy",
+    "enabled_as": "onistone.command.altspy",
 }
 
-def log(self: "PrimeBDS", message, type, toggles=None):
+def log(self: "OnistoneEssentials", message, type, toggles=None):
     if toggles is None:
         toggles = ["enabled_ms"]
 
@@ -103,7 +103,7 @@ def send_discord_message(webhook_url, payload):
             if response.status_code == 429:
                 retries += 1
                 wait_time = backoff * (2 ** retries)  # Exponential backoff
-                print(f"[primebds - Discord Log] Rate limit exceeded. Retrying in {wait_time}s...")
+                print(f"[Onistone Essentials - Discord Log] Rate limit exceeded. Retrying in {wait_time}s...")
                 time.sleep(wait_time)  # Wait before retrying
             else:
                 print(f"Failed to send Discord message: {e}")

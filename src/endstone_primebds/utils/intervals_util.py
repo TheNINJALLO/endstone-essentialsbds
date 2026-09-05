@@ -1,30 +1,30 @@
 from typing import TYPE_CHECKING, Callable, Optional
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
     from endstone import Player
 
 class IntervalManager:
     """Manages scheduled periodic checks for the plugin."""
 
-    def __init__(self, plugin: "PrimeBDS", tick_interval: int = 20):
+    def __init__(self, plugin: "OnistoneEssentials", tick_interval: int = 20):
         self.plugin = plugin
         self.tick_interval = tick_interval
         self._task_id: Optional[int] = None
-        self._check_functions: list[Callable[["PrimeBDS"], None]] = []
-        self._player_checks: dict[str, Callable[["PrimeBDS", "Player"], None]] = {}
+        self._check_functions: list[Callable[["OnistoneEssentials"], None]] = []
+        self._player_checks: dict[str, Callable[["OnistoneEssentials", "Player"], None]] = {}
 
-    def add_check(self, func: Callable[["PrimeBDS"], None]):
+    def add_check(self, func: Callable[["OnistoneEssentials"], None]):
         """Add a function to be called every interval."""
         if func not in self._check_functions:
             self._check_functions.append(func)
 
-    def remove_check(self, func: Callable[["PrimeBDS"], None]):
+    def remove_check(self, func: Callable[["OnistoneEssentials"], None]):
         """Remove a previously added check function."""
         if func in self._check_functions:
             self._check_functions.remove(func)
 
-    def add_player_check(self, player_name: str, func: Callable[["PrimeBDS", "Player"], None]):
+    def add_player_check(self, player_name: str, func: Callable[["OnistoneEssentials", "Player"], None]):
         """Register a repeating function for a specific player."""
         self._player_checks[player_name] = func
 

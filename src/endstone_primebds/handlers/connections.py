@@ -7,7 +7,7 @@ from endstone.event import PlayerLoginEvent, PlayerJoinEvent, PlayerQuitEvent, P
 from typing import TYPE_CHECKING
 from datetime import datetime
 from endstone_primebds.handlers.intervals import start_jail_check_if_needed, stop_jail_check_if_not_needed
-from endstone_primebds.utils.config_util import load_config
+from endstone_primebds.utils.config_util import CONFIG_FOLDER, load_config
 from endstone_primebds.utils.mod_util import format_time_remaining, ban_message
 from endstone_primebds.utils.logging_util import log, discordRelay
 from endstone.inventory import ItemStack
@@ -15,9 +15,9 @@ from endstone.inventory import ItemStack
 import endstone_primebds.utils.internal_permissions_util as perms_util
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
-def handle_login_event(self: "PrimeBDS", ev: PlayerLoginEvent):
+def handle_login_event(self: "OnistoneEssentials", ev: PlayerLoginEvent):
 
     self.crasher_patch_applied.discard(ev.player.xuid)
 
@@ -67,7 +67,7 @@ def handle_login_event(self: "PrimeBDS", ev: PlayerLoginEvent):
 
     return
 
-def handle_join_event(self: "PrimeBDS", ev: PlayerJoinEvent):
+def handle_join_event(self: "OnistoneEssentials", ev: PlayerJoinEvent):
 
     config = load_config()
     send_on_connect = config["modules"]["join_leave_messages"]["send_on_connection"]
@@ -130,7 +130,7 @@ def handle_join_event(self: "PrimeBDS", ev: PlayerJoinEvent):
     check_unset_scoreboards(self)
     return
 
-def handle_leave_event(self: "PrimeBDS", ev: PlayerQuitEvent):
+def handle_leave_event(self: "OnistoneEssentials", ev: PlayerQuitEvent):
 
     config = load_config()
     send_on_connect = config["modules"]["join_leave_messages"]["send_on_connection"]
@@ -180,7 +180,7 @@ def handle_leave_event(self: "PrimeBDS", ev: PlayerQuitEvent):
     discordRelay(f"**{ev.player.name}** has left the server ***({len(self.server.online_players)-1}/{self.server.max_players})***", "connections")
     return
 
-def handle_kick_event(self: "PrimeBDS", ev: PlayerKickEvent):
+def handle_kick_event(self: "OnistoneEssentials", ev: PlayerKickEvent):
     self.sldb.end_session(ev.player.xuid, int(time.time()))
 
 def check_unset_scoreboards(self):
@@ -191,7 +191,7 @@ def check_unset_scoreboards(self):
     ):
         current_dir = os.path.dirname(current_dir)
 
-    scoreboard_data_folder = os.path.join(current_dir, 'plugins/primebds_data', 'scoreboard_data')
+    scoreboard_data_folder = os.path.join(CONFIG_FOLDER, "scoreboard_data")
     if not os.path.exists(scoreboard_data_folder):
         return  # Folder doesn't exist, nothing to check
 
@@ -280,6 +280,6 @@ def check_unset_scoreboards(self):
             try:
                 with open(full_path, 'w') as f:
                     json.dump(data, f, indent=4)
-                print(f"[EssentialsBDS] Updated scoreboard file '{filename}' after loading missing entries.")
+                print(f"[Onistone Essentials] Updated scoreboard file '{filename}' after loading missing entries.")
             except Exception as e:
-                print(f"[EssentialsBDS] Could not save updated scoreboard file {filename}: {e}")
+                print(f"[Onistone Essentials] Could not save updated scoreboard file {filename}: {e}")

@@ -5,17 +5,17 @@ from typing import TYPE_CHECKING
 import math
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Command registration
 command, permission = create_command(
     "blockscan",
     "Continuously show information about the block you're looking at.",
     ["/blockscan (disable)[blockscan: blockscan]"],
-    ["primebds.command.blockscan"]
+    ["onistone.command.blockscan"]
 )
 
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if not isinstance(sender, Player):
         sender.send_message("§cOnly players can use this command")
         return True
@@ -119,7 +119,7 @@ def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
 
     return True
 
-def clear_all_blockscan_intervals(self: "PrimeBDS"):
+def clear_all_blockscan_intervals(self: "OnistoneEssentials"):
     """Clear all active intervals."""
     for player_name, task_id in self.blockscan_intervals.items():
         self.server.scheduler.cancel_task(task_id) 

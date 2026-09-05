@@ -12,17 +12,17 @@ except Exception as e:
     PACKET_SUPPORT = False
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Command registration
 command, permission = create_command(
     "monitor",
     "Monitor server performance in real time!",
     ["/monitor (server|packets|disable)[debug: debug]"],
-    ["primebds.command.monitor"]
+    ["onistone.command.monitor"]
 )
 
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if not isinstance(sender, Player):
         sender.send_error_message("This command can only be executed by a player")
         return True
@@ -168,7 +168,7 @@ def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
 def get_ping_color(ping: int) -> str:
     return ColorFormat.GREEN if ping <= 80 else ColorFormat.YELLOW if ping <= 160 else ColorFormat.RED
 
-def clear_all_monitor_intervals(self: "PrimeBDS"):
+def clear_all_monitor_intervals(self: "OnistoneEssentials"):
     """Clear all active intervals."""
     for player_name, task_id in self.monitor_intervals.items():
         self.server.scheduler.cancel_task(task_id) 

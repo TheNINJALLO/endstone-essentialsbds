@@ -8,12 +8,12 @@ from endstone_primebds.utils.mod_util import format_time_remaining
 from endstone_primebds.utils.logging_util import discordRelay
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
-def handle_chat_event(self: "PrimeBDS", ev: PlayerChatEvent):
+def handle_chat_event(self: "OnistoneEssentials", ev: PlayerChatEvent):
     user_muted = self.db.check_and_update_mute(ev.player.xuid, ev.player.name)
     ip_muted, ip_mute_time, ip_mute_reason = self.db.check_ip_mute(str(ev.player.address))
-    if self.globalmute == 1 and not ev.player.has_permission("primebds.globalmute.exempt"):
+    if self.globalmute == 1 and not ev.player.has_permission("onistone.globalmute.exempt"):
         ev.player.send_message(f"§cGlobal chat is currently muted by an admin")
         ev.is_cancelled = True
         return False
@@ -44,7 +44,7 @@ def handle_chat_event(self: "PrimeBDS", ev: PlayerChatEvent):
         safe_message = ev.message.replace("{", "{{").replace("}", "}}")
         sc_prefix = server_messages.get("staff_chat_prefix", "§8[§bSC§8] ")
         message = f"{sc_prefix}§e{ev.player.name}§7: §6{safe_message}"
-        self.server.broadcast(message, "primebds.command.staffchat")
+        self.server.broadcast(message, "onistone.command.staffchat")
         ev.is_cancelled = True
         return False
     

@@ -5,7 +5,7 @@ from endstone_primebds.utils.command_util import create_command
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Caching terrain height maps for optimization
 terrain_cache = {}  # {(x, z): lowest_air_y}
@@ -15,11 +15,11 @@ command, permission = create_command(
     "bottom",
     "Warps you to the nearest air pocket below you!",
     ["/bottom"],
-    ["primebds.command.bottom"]
+    ["onistone.command.bottom"]
 )
 
 # BOTTOM COMMAND FUNCTIONALITY
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if not isinstance(sender, Player):
         sender.send_error_message(f"This command can only be executed by a player.")
         return False

@@ -5,17 +5,17 @@ from endstone_primebds.utils.config_util import load_config
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
     "broadcast",
     "Send a server-wide notification!",
     ["/broadcast <message: message>"],
-    ["primebds.command.broadcast"]
+    ["onistone.command.broadcast"]
 )
 
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     config = load_config()
     self.server.broadcast_message(f"{config['modules']['broadcast']['prefix']}{args[0]}")
 

@@ -9,7 +9,7 @@ from endstone_primebds.utils.time_util import TimezoneUtils
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
@@ -19,10 +19,10 @@ command, permission = create_command(
      "/note <player: player> [page: int]",
      "/note <player: player> (remove)<note_remove: note_remove> <id: int>",
      "/note <player: player> (add)<note_add: note_add> <message: message>"],
-    ["primebds.command.note"]
+    ["onistone.command.note"]
 )
 
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if BlockCommandSender is not None and isinstance(sender, BlockCommandSender):
        sender.send_message("§cThis command cannot be automated")
        return False

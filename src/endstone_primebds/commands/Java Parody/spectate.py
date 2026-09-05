@@ -12,18 +12,18 @@ from endstone_primebds.utils.target_selector_util import get_matching_actors
 from endstone_primebds.utils.config_util import load_config
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
     "spectate",
     "Warps you to a non-spectating player!",
     ["/spectate [player: player]"],
-    ["primebds.command.spectate"]
+    ["onistone.command.spectate"]
 )
 
 # SPECTATE COMMAND FUNCTIONALITY
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
 
     if any("@a" in arg for arg in args):
         sender.send_message(f"§cYou cannot select all players for this command")

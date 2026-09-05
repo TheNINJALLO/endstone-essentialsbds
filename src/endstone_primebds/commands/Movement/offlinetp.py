@@ -5,18 +5,18 @@ from endstone.level import Location
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 command, permission = create_command(
     "offlinetp",
     "Teleport to where a player last logged out.",
     ["/offlinetp [player: player]"],
-    ["primebds.command.offlinetp"],
+    ["onistone.command.offlinetp"],
     "op",
     ["otp"]
 )
 
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if not isinstance(sender, Player):
         sender.send_message("§cThis command can only be executed by a player")
         return False

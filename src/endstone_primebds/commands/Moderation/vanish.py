@@ -12,18 +12,18 @@ except Exception:
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
     "vanish",
     "Completely hide your server visibility!",
     ["/vanish"],
-    ["primebds.command.vanish"]
+    ["onistone.command.vanish"]
 )
 
 # VANISH COMMAND FUNCTIONALITY
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if not isinstance(sender, Player):
         sender.send_message("This command can only be executed by a player")
         return False
@@ -52,7 +52,7 @@ def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
     return True
 
 
-def hide_player(self: "PrimeBDS", target: Player):
+def hide_player(self: "OnistoneEssentials", target: Player):
     """Hide a player from all other online players."""
     if not PACKET_SUPPORT:
         return
@@ -72,7 +72,7 @@ def hide_player(self: "PrimeBDS", target: Player):
             player.send_message(f"{leave_message.replace('{player}', target.name)}")
 
 
-def reveal_player(self: "PrimeBDS", target: Player):
+def reveal_player(self: "OnistoneEssentials", target: Player):
     """Reveal a player to all other online players."""
     if not PACKET_SUPPORT:
         return

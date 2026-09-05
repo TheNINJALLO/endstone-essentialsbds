@@ -15,7 +15,7 @@ from datetime import timedelta, datetime
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
@@ -25,11 +25,11 @@ command, permission = create_command(
         "/jail <player: player> <jail: string> <duration_number: int> (second|minute|hour|day|week|month|year)<duration_length: jail_length> [reason: message]",
         "/jail <player: player> <jail: string> (forever)<perm_jail: perm_jail> [reason: message]"
     ],
-    ["primebds.command.jail"]
+    ["onistone.command.jail"]
 )
 
 # JAIL COMMAND FUNCTIONALITY
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if BlockCommandSender is not None and isinstance(sender, BlockCommandSender):
        sender.send_message("§cThis command cannot be automated")
        return False

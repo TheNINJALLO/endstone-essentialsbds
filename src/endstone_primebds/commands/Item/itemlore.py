@@ -4,7 +4,7 @@ from endstone_primebds.utils.target_selector_util import get_matching_actors
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
@@ -16,13 +16,13 @@ command, permission = create_command(
         "/itemlore <player: player> (delete)<delete_lore: delete_lore> [item_lore_line: int] (slot|helmet|chestplate|leggings|boots|mainhand|offhand)[slotType: slotTypeDeleteLore] [slot: int]",
         "/itemlore <player: player> (clear)<clear_lore: clear_lore> (slot|helmet|chestplate|leggings|boots|mainhand|offhand)[slotType: slotTypeSlotClearLore] [slot: int]"
     ],
-    ["primebds.command.itemlore"],
+    ["onistone.command.itemlore"],
     "op",
     ["lore"]
 )
 
 
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if len(args) < 2:
         sender.send_message("§cUsage: /itemlore <player> <add|set|delete|clear> [message|line] [slotType] [slot]")
         return False

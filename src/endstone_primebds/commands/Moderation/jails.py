@@ -10,7 +10,7 @@ from endstone.util import Vector
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
@@ -20,10 +20,10 @@ command, permission = create_command(
         "/jails (list)[list_jails: list_jails]",
         "/jails (create|delete|tp)<jail_action: jail_action> <jail: string> [location: pos]"
     ],
-    ["primebds.command.jails"]
+    ["onistone.command.jails"]
 )
 
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if isinstance(sender, BlockCommandSender):
         sender.send_message("§cThis command cannot be automated")
         return False

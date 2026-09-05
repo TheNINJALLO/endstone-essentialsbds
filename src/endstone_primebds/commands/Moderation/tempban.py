@@ -12,18 +12,18 @@ from datetime import timedelta, datetime
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
     "tempban",
     "Temporarily bans a player from the server!",
     ["/tempban <player: player> <duration_number: int> (second|minute|hour|day|week|month|year)<duration_length: ban_length> [reason: message]"],
-    ["primebds.command.tempban"]
+    ["onistone.command.tempban"]
 )
 
 # TEMPBAN COMMAND FUNCTIONALITY
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if BlockCommandSender is not None and isinstance(sender, BlockCommandSender):
        sender.send_message("§cThis command cannot be automated")
        return False

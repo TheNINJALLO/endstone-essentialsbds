@@ -12,7 +12,7 @@ from endstone import GameMode
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
@@ -21,11 +21,11 @@ command, permission = create_command(
     [
         "/unjail <player: player>"
     ],
-    ["primebds.command.unjail"]
+    ["onistone.command.unjail"]
 )
 
 # UNJAIL COMMAND FUNCTIONALITY
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if BlockCommandSender is not None and isinstance(sender, BlockCommandSender):
        sender.send_message("§cThis command cannot be automated")
        return False

@@ -9,7 +9,7 @@ from endstone_primebds.utils.target_selector_util import get_matching_actors
 import endstone_primebds.utils.internal_permissions_util as perms_util
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Move outside the function to avoid rebuilding every time
 MODERATION_COMMANDS = {
@@ -27,7 +27,7 @@ PARSE_COMMANDS = (
     | {"teleport", "tp", "stop"}
 )
 
-def handle_command_preprocess(self: "PrimeBDS", event: PlayerCommandEvent):
+def handle_command_preprocess(self: "OnistoneEssentials", event: PlayerCommandEvent):
     command = event.command
     player = event.player
 
@@ -81,11 +81,11 @@ def handle_command_preprocess(self: "PrimeBDS", event: PlayerCommandEvent):
         target = self.db.get_offline_user(args[1])
         if target:
             if (
-                (cmd == "jail" and perms_util.check_perms(self, target, "primebds.exempt.jail")) or
-                (cmd == "warn" and perms_util.check_perms(self, target, "primebds.exempt.warn")) or
-                (cmd == "kick" and perms_util.check_perms(self, target, "primebds.exempt.kick")) or
-                (cmd in {"mute", "tempmute"} and perms_util.check_perms(self, target, "primebds.exempt.mute")) or
-                (cmd in {"permban", "tempban", "ipban", "ban", "ban-ip"} and perms_util.check_perms(self, target, "primebds.exempt.ban"))
+                (cmd == "jail" and perms_util.check_perms(self, target, "onistone.exempt.jail")) or
+                (cmd == "warn" and perms_util.check_perms(self, target, "onistone.exempt.warn")) or
+                (cmd == "kick" and perms_util.check_perms(self, target, "onistone.exempt.kick")) or
+                (cmd in {"mute", "tempmute"} and perms_util.check_perms(self, target, "onistone.exempt.mute")) or
+                (cmd in {"permban", "tempban", "ipban", "ban", "ban-ip"} and perms_util.check_perms(self, target, "onistone.exempt.ban"))
             ):
                 player.send_message(f"§6Player §e{target.name} §6is exempt from §e{cmd}")
                 is_exempt = True
@@ -108,7 +108,7 @@ def handle_command_preprocess(self: "PrimeBDS", event: PlayerCommandEvent):
         for pl in matched:
             target = self.db.get_online_user(pl.xuid)
 
-            if perms_util.check_perms(self, target, "primebds.exempt.kick"):
+            if perms_util.check_perms(self, target, "onistone.exempt.kick"):
                 player.send_message(f"§6Player §e{target.name} §6is exempt from §e{cmd}")
                 continue
 
@@ -197,7 +197,7 @@ def handle_command_preprocess(self: "PrimeBDS", event: PlayerCommandEvent):
         self.db.update_user_data(player.name, 'last_messaged', target)
         target_user = self.db.get_offline_user(target)
         if target_user is not None:
-            if target_user.enabled_mt == 0 and not player.has_permission("primebds.exempt.msgtoggle"):
+            if target_user.enabled_mt == 0 and not player.has_permission("onistone.exempt.msgtoggle"):
                 player.send_message("§cThis player has private messages disabled")
                 event.is_cancelled = True
                 return True
@@ -214,10 +214,10 @@ def handle_command_preprocess(self: "PrimeBDS", event: PlayerCommandEvent):
         for pl in self.server.online_players:  
             user = self.db.get_online_user(pl.xuid)
             if user:
-                if user.enabled_ss == 1 and pl.has_permission("primebds.command.socialspy"):
+                if user.enabled_ss == 1 and pl.has_permission("onistone.command.socialspy"):
                     pl.send_message(f"{config['modules']['server_messages']['social_spy_prefix']}§8[§r{player.name} §7-> §r{target}§8] §7{message}")
 
-def handle_server_command_preprocess(self: "PrimeBDS", event: ServerCommandEvent):
+def handle_server_command_preprocess(self: "OnistoneEssentials", event: ServerCommandEvent):
     args = event.command.split()
     if not args:
         return

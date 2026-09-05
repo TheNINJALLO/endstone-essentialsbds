@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 from endstone_primebds.utils.form_wrapper_util import ActionFormResponse, ActionFormData
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
@@ -20,11 +20,11 @@ command, permission = create_command(
     "Manage punishment history of a specified player!",
     ["/punishments <player: player> [page: int]",
      "/punishments <player: player> (remove|clear) <punishment_removal: remove_punishment_log>"],
-    ["primebds.command.punishments"]
+    ["onistone.command.punishments"]
 )
 
 # PUNISHMENTS CMD FUNCTIONALITY
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if BlockCommandSender is not None and isinstance(sender, BlockCommandSender):
        sender.send_message("§cThis command cannot be automated")
        return False
@@ -67,7 +67,7 @@ def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
     sender.send_message(history_message)
     return True
 
-def clear_all_punishments(self: "PrimeBDS", sender: CommandSender, target_name: str) -> bool:
+def clear_all_punishments(self: "OnistoneEssentials", sender: CommandSender, target_name: str) -> bool:
     """Clears all punishment logs for the selected player."""
     
 
@@ -80,7 +80,7 @@ def clear_all_punishments(self: "PrimeBDS", sender: CommandSender, target_name: 
 
     return True
 
-def remove_punishment_by_id(self: "PrimeBDS", sender: CommandSender, target_name: str) -> bool:
+def remove_punishment_by_id(self: "OnistoneEssentials", sender: CommandSender, target_name: str) -> bool:
     """Removes a specific punishment by ID using a menu."""
 
     # Retrieve punishment history

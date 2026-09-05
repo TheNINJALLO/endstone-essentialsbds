@@ -5,20 +5,20 @@ from time import time
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 command, permission = create_command(
     "spawn",
     "Warps you to the spawn!",
     ["/spawn"],
-    ["primebds.command.spawn"]
+    ["onistone.command.spawn"]
 )
 
 spawn_cooldowns: dict[str, float] = {}
 spawn_delays: dict[str, bool] = {}
 spawn_tasks: dict[str, int] = {}
 
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if not isinstance(sender, Player):
         sender.send_error_message("This command can only be executed by a player")
         return False

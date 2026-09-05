@@ -13,7 +13,7 @@ from endstone_primebds.utils.target_selector_util import get_target_entity
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
@@ -22,10 +22,10 @@ command, permission = create_command(
     [
         "/entityinfo (list)[entity_action: entity_action] [page: int]"
     ],
-    ["primebds.command.entityinfo"]
+    ["onistone.command.entityinfo"]
 )
 
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if isinstance(sender, BlockCommandSender):
         sender.send_message("§cThis command cannot be automated")
         return False

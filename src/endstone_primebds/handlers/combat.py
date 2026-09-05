@@ -8,9 +8,9 @@ from endstone.event import ActorDamageEvent, ActorKnockbackEvent
 from endstone_primebds.utils.config_util import load_config
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
-def handle_damage_event(self: "PrimeBDS", ev: ActorDamageEvent):
+def handle_damage_event(self: "OnistoneEssentials", ev: ActorDamageEvent):
     config = load_config()
     entity = ev.actor
     entity_key = f"{entity.type}:{entity.id}"
@@ -54,7 +54,7 @@ def handle_damage_event(self: "PrimeBDS", ev: ActorDamageEvent):
     if current_time - last_hit_time < kb_cooldown and damage_type == "entity_attack":
         ev.is_cancelled = True
 
-def handle_kb_event(self: "PrimeBDS", ev: ActorKnockbackEvent):
+def handle_kb_event(self: "OnistoneEssentials", ev: ActorKnockbackEvent):
 
     config = load_config()
     source = ev.source

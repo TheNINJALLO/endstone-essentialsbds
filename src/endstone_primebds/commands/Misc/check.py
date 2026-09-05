@@ -9,20 +9,20 @@ from endstone_primebds.utils.command_util import create_command
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
     "check",
     "Checks a player's client info!",
     ["/check <player: player> (info|mod|jail|network|world)[info: info]"],
-    ["primebds.command.check"],
+    ["onistone.command.check"],
     "op",
     ["seen"]
 )
 
 # CHECK COMMAND FUNCTIONALITY
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
 
     if any("@" in arg for arg in args):
         sender.send_message(f"§cTarget selectors are invalid for this command")

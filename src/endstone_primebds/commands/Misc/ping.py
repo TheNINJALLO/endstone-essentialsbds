@@ -6,17 +6,17 @@ from endstone_primebds.utils.target_selector_util import get_matching_actors
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
     "ping",
     "Checks the server ping!",
     ["/ping [player: player]"],
-    ["primebds.command.ping"]
+    ["onistone.command.ping"]
 )
 
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if len(args) == 0:
         if not isinstance(sender, Player):
             sender.send_error_message("This command can only be executed by a player")

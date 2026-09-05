@@ -1,26 +1,34 @@
 import json
 import os
-import re
 import sqlite3
 import threading
 from dataclasses import dataclass, fields
 import time
 from typing import List, Tuple, Any, Dict, Optional
 from endstone import Player
-from endstone.inventory import ItemStack
 from endstone.level import Location
 from endstone.util import Vector
 from endstone_primebds.utils.address_util import same_subnet
 from endstone_primebds.utils.mod_util import format_time_remaining
 from endstone_primebds.utils.time_util import TimezoneUtils
-from endstone_primebds.utils.config_util import find_server_properties, find_and_load_config, parse_properties_file, find_folder
+from endstone_primebds.utils.permission_manager_util import (
+    migrate_permission_mapping,
+    migrate_permission_name,
+)
+from endstone_primebds.utils.config_util import (
+    CONFIG_FOLDER,
+    find_server_properties,
+    find_and_load_config,
+    parse_properties_file,
+    find_folder,
+)
 from datetime import datetime
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 while not (os.path.exists(os.path.join(current_dir, 'plugins')) and os.path.exists(os.path.join(current_dir, 'worlds'))):
     current_dir = os.path.dirname(current_dir)
 
-DB_FOLDER = os.path.join(current_dir, 'plugins', 'primebds_data', "database")
+DB_FOLDER = os.path.join(CONFIG_FOLDER, "database")
 os.makedirs(DB_FOLDER, exist_ok=True)
 
 @dataclass
@@ -155,7 +163,9 @@ class DatabaseManager:
 
     def __init__(self, db_name: str):
         start_path = os.path.dirname(os.path.abspath(__file__))
-        config = find_and_load_config("primebds_data/config.json", start_path, "multiworld", 20, True)
+        config = find_and_load_config(
+            "onistone_essentials/config.json", start_path, "multiworld", 20, True
+        )
         main_server_properties = find_and_load_config("server.properties", start_path)
         local_server_properties = parse_properties_file(find_server_properties(start_path))
 
@@ -169,7 +179,9 @@ class DatabaseManager:
             worlds = multiworld.get("worlds", {})
             is_enabled = worlds[level].get("enabled", False)
             if is_enabled:
-                main_root = find_folder("primebds_data/database", start_path, "multiworld", 20, True)
+                main_root = find_folder(
+                    "onistone_essentials/database", start_path, "multiworld", 20, True
+                )
                 if main_root:
                     self.db_path = os.path.join(main_root, db_name if db_name.endswith('.db') else db_name + '.db')
                     print("DEBUG: SUB-WORLD DB LINKED")
@@ -1565,7 +1577,7 @@ class UserDB(DatabaseManager):
         start, end = (page - 1) * per_page, (page - 1) * per_page + per_page
         paginated_past = past_punishments[start:end]
 
-        msg = [f""]
+        msg = [""]
 
         if active_punishments:
             msg.append(f"§aActive §6Punishments for §e{name}§6:")
@@ -1774,20 +1786,30 @@ class UserDB(DatabaseManager):
         row = cursor.fetchone()
         if not row or not row[0]:
             return {}
-        return json.loads(row[0])
+        try:
+            loaded = json.loads(row[0])
+        except (json.JSONDecodeError, TypeError):
+            return {}
+        if not isinstance(loaded, dict):
+            return {}
+        migrated, changed = migrate_permission_mapping(loaded)
+        if changed:
+            self.set_permissions(xuid, migrated)
+        return migrated
 
     def set_permission(self, xuid: str, permission: str, allowed: bool):
         """Set one permission in the perms JSON."""
         perms = self.get_permissions(xuid)
-        perms[permission] = allowed
+        perms[migrate_permission_name(permission).lower()] = allowed
         self.set_permissions(xuid, perms)
         self.invalidate_user_cache(xuid)
         
     def delete_permission(self, xuid: str, permission: str):
         """Delete a permission from the perms JSON."""
         perms = self.get_permissions(xuid)
-        if permission in perms:
-            del perms[permission]
+        normalized = migrate_permission_name(permission).lower()
+        if normalized in perms:
+            del perms[normalized]
             self.set_permissions(xuid, perms)
 
     def update_user_data(self, name: str, column: str, value):

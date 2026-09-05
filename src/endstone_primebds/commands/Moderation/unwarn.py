@@ -10,7 +10,7 @@ from endstone_primebds.utils.logging_util import log
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
@@ -18,10 +18,10 @@ command, permission = create_command(
     "Remove a warning or clear all warnings from a player!",
     ["/unwarn <player: player> (clear)<warn_action: warn_action>",
      "/unwarn <player: player> [id: int]"],
-    ["primebds.command.unwarn"]
+    ["onistone.command.unwarn"]
 )
 
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if BlockCommandSender is not None and isinstance(sender, BlockCommandSender):
        sender.send_message("§cThis command cannot be automated")
        return False

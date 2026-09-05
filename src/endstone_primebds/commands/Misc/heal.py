@@ -5,18 +5,18 @@ from endstone_primebds.utils.target_selector_util import get_matching_actors
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
     "heal",
     "Sets player health to full!",
     ["/heal [player: player]"],
-    ["primebds.command.heal", "primebds.command.heal.other"]
+    ["onistone.command.heal", "onistone.command.heal.other"]
 )
 
 # HEAL COMMAND FUNCTIONALITY
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     if len(args) == 0:
         if not isinstance(sender, Player):
             sender.send_message("This command can only be executed by a player")
@@ -25,7 +25,7 @@ def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
         sender.send_message(f'§aYou were healed')
         return True
     
-    if not sender.has_permission("primebds.command.heal.other"):
+    if not sender.has_permission("onistone.command.heal.other"):
         sender.send_message(f'§cYou do not have permission to heal others')
         return True
     

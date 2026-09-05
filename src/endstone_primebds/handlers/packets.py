@@ -17,7 +17,7 @@ from endstone_primebds.utils.config_util import load_config
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 config = load_config()
 modules = config.get("modules", {})
@@ -28,7 +28,7 @@ mute_sounds = optimizer.get("mute_laggy_sounds", False)
 mute_block_updates = optimizer.get("mute_laggy_block_events", False)
 mute_movement_updates = optimizer.get("mute_laggy_movement_updates", False)
 
-def handle_packetsend_event(self: "PrimeBDS", ev: PacketSendEvent):
+def handle_packetsend_event(self: "OnistoneEssentials", ev: PacketSendEvent):
     if not PACKET_SUPPORT:
         return
 
@@ -52,7 +52,7 @@ def handle_packetsend_event(self: "PrimeBDS", ev: PacketSendEvent):
     if self.monitor_intervals:
         self.packets_sent_count[pid] = self.packets_sent_count.get(pid, 0) + 1
 
-def handle_packetreceive_event(self: "PrimeBDS", ev: PacketReceiveEvent):
+def handle_packetreceive_event(self: "OnistoneEssentials", ev: PacketReceiveEvent):
     pid = ev.packet_id
 
     if pid == MinecraftPacketIds.SubclientLogin:
@@ -65,7 +65,7 @@ def handle_packetreceive_event(self: "PrimeBDS", ev: PacketReceiveEvent):
     if self.monitor_intervals:
         self.packets_sent_count[pid] = self.packets_sent_count.get(pid, 0) + 1
 
-def mute_redundant_move_events(self: "PrimeBDS", ev):
+def mute_redundant_move_events(self: "OnistoneEssentials", ev):
     stream = BinaryStream(ev.payload)
 
     runtime_id = stream.get_varint()
@@ -85,7 +85,7 @@ received_open = defaultdict(set)
 def make_key(x: int, y: int, z: int) -> str:
     return f"{x},{y},{z}"
 
-def mute_redundant_block_events(self: "PrimeBDS", ev):
+def mute_redundant_block_events(self: "OnistoneEssentials", ev):
     stream = BinaryStream(ev.payload)
     x = stream.get_varint()
     y = c_int32(stream.get_unsigned_varint()).value
@@ -120,12 +120,12 @@ def mute_redundant_block_events(self: "PrimeBDS", ev):
         received_open.pop(key, None)
         return
     
-def handle_subclient_login(self: "PrimeBDS", ev: PacketSendEvent):
+def handle_subclient_login(self: "OnistoneEssentials", ev: PacketSendEvent):
     if not self.gamerules.get("subclient"):
         if ev.sub_client_id != 0:
             ev.is_cancelled = True
 
-def handle_add_player_cache(self: "PrimeBDS", ev):
+def handle_add_player_cache(self: "OnistoneEssentials", ev):
     player_name = extract_player_name_from_addplayer(ev.payload)
     target_player = self.server.get_player(player_name)
     if not target_player:
@@ -142,7 +142,7 @@ def handle_add_player_cache(self: "PrimeBDS", ev):
         ev.is_cancelled = True
     return
 
-def handle_laggy_sounds(self: "PrimeBDS", ev):
+def handle_laggy_sounds(self: "OnistoneEssentials", ev):
     try:
         packet = minecraft_packets.LevelSoundEventPacket()
         packet.deserialize(ev.payload)

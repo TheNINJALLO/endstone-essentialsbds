@@ -1,12 +1,21 @@
 import json
 import os
 import copy
+import shutil
+
+from endstone_primebds.utils.permission_manager_util import migrate_permission_mapping
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 while not (os.path.exists(os.path.join(current_dir, 'plugins')) and os.path.exists(os.path.join(current_dir, 'worlds'))):
     current_dir = os.path.dirname(current_dir)
 
-CONFIG_FOLDER = os.path.join(current_dir, 'plugins', 'primebds_data')
+CONFIG_FOLDER = os.path.join(current_dir, "plugins", "onistone_essentials")
+LEGACY_CONFIG_FOLDER = os.path.join(current_dir, "plugins", "primebds_data")
+
+if not os.path.exists(CONFIG_FOLDER) and os.path.isdir(LEGACY_CONFIG_FOLDER):
+    shutil.copytree(LEGACY_CONFIG_FOLDER, CONFIG_FOLDER)
+    print("[Onistone Essentials] Migrated existing plugin data to onistone_essentials.")
+
 CONFIG_PATH = os.path.join(CONFIG_FOLDER, 'config.json')
 CMD_CONFIG_PATH = os.path.join(CONFIG_FOLDER, 'commands.json')
 PERMISSIONS_PATH = os.path.join(CONFIG_FOLDER, 'permissions.json')
@@ -21,14 +30,20 @@ PERMISSIONS_DEFAULT = {
             "endstone.broadcast.user": True,
             "endstone.command.version": True,
             "endstone.command.plugins": True,
-            "primebds.command.ping": True,
-            "primebds.command.reply": True,
+            "onistone.command.ping": True,
+            "onistone.command.reply": True,
             "minecraft.command.list": True,
             "minecraft.command.tell": True,
             "minecraft.command.me": True,
         },
         "inherits": [],
-        "weight": 0
+        "weight": 0,
+        "display_name": "Member",
+        "color": "§7",
+        "show_title": False,
+        "brackets": True,
+        "prefix": "",
+        "suffix": "§r"
     },
     "Operator": {
         "permissions": {
@@ -36,6 +51,10 @@ PERMISSIONS_DEFAULT = {
         },
         "inherits": ["Default"],
         "weight": 100,
+        "display_name": "Admin",
+        "color": "§c",
+        "show_title": True,
+        "brackets": True,
         "prefix": "§8[§cAdmin§8] §c",
         "suffix": "§r"
     },
@@ -47,7 +66,7 @@ permissions_cache = None
 rules_cache = None
 
 def load_cmd_config():
-    """Load or create a configuration file in primebds_info/commands.json, cached in memory."""
+    """Load or create the Onistone command-module configuration."""
     global cmd_cache
     if cmd_cache is not None:
         return cmd_cache
@@ -94,7 +113,7 @@ def load_config():
         os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
         cache = default_config
         # DON'T save immediately
-        print(f"[EssentialsBDS] Config file not found, using defaults in memory.")
+        print("[Onistone Essentials] Config file not found, using defaults in memory.")
         return cache
 
     try:
@@ -105,13 +124,19 @@ def load_config():
         else:
             cache = default_config
             # DON'T save immediately
-            print(f"[EssentialsBDS] Config file empty, using defaults in memory.")
+            print("[Onistone Essentials] Config file empty, using defaults in memory.")
     except json.JSONDecodeError as e:
-        print(f"[EssentialsBDS] JSON error in config.json: {e}. Using defaults in memory.")
+        print(f"[Onistone Essentials] JSON error in config.json: {e}. Using defaults in memory.")
         cache = default_config
     except OSError as e:
-        print(f"[EssentialsBDS] Failed to read config.json: {e}. Using defaults in memory.")
+        print(f"[Onistone Essentials] Failed to read config.json: {e}. Using defaults in memory.")
         cache = default_config
+
+    permissions_manager = cache.get("modules", {}).get("permissions_manager", {})
+    legacy_key = "".join(("prime", "bds"))
+    if legacy_key in permissions_manager:
+        permissions_manager.setdefault("onistone", permissions_manager.pop(legacy_key))
+        save_config(cache)
 
     return cache
 
@@ -165,6 +190,22 @@ def load_permissions(default_permissions=None, cache=True):
             save_permissions(permissions_cache)
 
     updated = False
+    for group in permissions_cache.values():
+        if not isinstance(group, dict):
+            continue
+        explicit = group.get("permissions", {})
+        if isinstance(explicit, list):
+            explicit = {
+                permission: True
+                for permission in explicit
+                if isinstance(permission, str)
+            }
+        if not isinstance(explicit, dict):
+            explicit = {}
+        migrated, namespace_changed = migrate_permission_mapping(explicit)
+        group["permissions"] = migrated
+        updated = updated or namespace_changed
+
     for key in ["Default", "Operator"]:
         if key not in permissions_cache:
             permissions_cache[key] = PERMISSIONS_DEFAULT.get(key, {})

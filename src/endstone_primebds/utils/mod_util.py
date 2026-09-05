@@ -4,7 +4,7 @@ from endstone.inventory import ItemStack
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 
 def ban_message(server, expiration, reason) -> str:

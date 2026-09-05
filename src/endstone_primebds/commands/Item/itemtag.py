@@ -4,7 +4,7 @@ from endstone_primebds.utils.target_selector_util import get_matching_actors
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from endstone_primebds.primebds import PrimeBDS
+    from endstone_primebds.primebds import OnistoneEssentials
 
 # Register command
 command, permission = create_command(
@@ -13,10 +13,10 @@ command, permission = create_command(
     [
         "/itemtag <player: player> (unbreakable)<itemTag: itemTag> <is: bool> (slot|helmet|chestplate|leggings|boots|mainhand|offhand)[slotTypeTag: slotTypeTag] [slot: int]"
     ],
-    ["primebds.command.itemtag"]
+    ["onistone.command.itemtag"]
 )
 
-def handler(self: "PrimeBDS", sender: CommandSender, args: list[str]) -> bool:
+def handler(self: "OnistoneEssentials", sender: CommandSender, args: list[str]) -> bool:
     target_selector = args[0]
     tag_type = args[1].lower()
     tag_value_str = args[2].lower()
