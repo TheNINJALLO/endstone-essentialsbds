@@ -131,13 +131,23 @@ def test_permissions_are_explicitly_registered_but_not_all_command_level(monkeyp
     }
 
 
+def test_command_registration_accepts_case_insensitive_subcommands(monkeypatch):
+    module, _player = load_entityinfo_without_block_sender(monkeypatch)
+    usages = module.command["entityinfo"]["usages"]
+
+    assert usages[0] == "/entityinfo"
+    assert usages[1] == "/entityinfo <action: str>"
+    assert usages[-1].endswith("<arg5: str>")
+    assert all(": string>" not in usage for usage in usages)
+
+
 def test_console_can_start_scan_and_help_does_not_enumerate_actors(monkeypatch):
     module, _player = load_entityinfo_without_block_sender(monkeypatch)
     sender = Console({module.HOTSPOT_PERMISSION})
     instance = plugin()
 
     assert module.handler(instance, sender, ["hotspots", "help"]) is True
-    assert module.handler(instance, sender, ["hotspots"]) is True
+    assert module.handler(instance, sender, ["Hotspots"]) is True
     assert instance.entity_hotspot_service.started == 1
 
 
