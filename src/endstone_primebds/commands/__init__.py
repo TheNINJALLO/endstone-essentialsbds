@@ -1,5 +1,4 @@
 import importlib
-import json
 import pkgutil
 import os
 
@@ -12,10 +11,6 @@ from collections import defaultdict, OrderedDict
 preloaded_commands = {}
 preloaded_permissions = {}
 preloaded_handlers = {}
-
-from collections import OrderedDict
-import os
-import json
 
 def preload_settings():
     """Preload all plugin settings with defaults if missing, preserving key order and example structures,
@@ -93,6 +88,23 @@ def preload_settings():
             "mute_laggy_sounds": True,
             "mute_laggy_block_events": True,
             "mute_laggy_movement_updates": False
+        }),
+        "entity_hotspots": OrderedDict({
+            "enabled": True,
+            "results_per_page": 5,
+            "include_players": False,
+            "scan_cooldown_seconds": 15,
+            "snapshot_lifetime_seconds": 300,
+            "max_retained_snapshots": 16,
+            "max_concurrent_scans": 1,
+            "max_actors": 20000,
+            "max_scan_seconds": 8.0,
+            "actors_per_tick": 750,
+            "dense_chunk_threshold": 10,
+            "teleport_enabled": True,
+            "teleport_horizontal_radius": 4,
+            "teleport_vertical_radius": 32,
+            "teleport_max_candidates": 512
         }),
         "server_messages": OrderedDict({
             "skin_change_messages": True,
@@ -172,12 +184,26 @@ def preload_settings():
     # Ensure the modules section exists
     config.setdefault("modules", OrderedDict())
 
-    # Only add missing top-level modules, preserving existing ones completely
+    def merge_missing(target, defaults):
+        """Recursively add defaults without changing an administrator's values."""
+        was_changed = False
+        for key, value in defaults.items():
+            if key not in target:
+                target[key] = value
+                was_changed = True
+            elif isinstance(value, dict) and isinstance(target[key], dict):
+                was_changed = merge_missing(target[key], value) or was_changed
+        return was_changed
+
+    # Preserve existing modules exactly. The new hotspot section is recursively
+    # completed so future hotspot settings can be introduced without overwrites.
     changed = False
     for module, defaults in default_modules.items():
         if module not in config["modules"]:
             config["modules"][module] = defaults
             changed = True
+        elif module == "entity_hotspots" and isinstance(config["modules"][module], dict):
+            changed = merge_missing(config["modules"][module], defaults) or changed
 
     # Remove unknown top-level modules (optional; can be commented if you want full safety)
     # for module in list(config["modules"].keys()):

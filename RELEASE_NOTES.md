@@ -1,20 +1,18 @@
-# Onistone Essentials v3.5.0
+# Onistone Essentials v3.5.1
 
-This release completes the Onistone rebrand and introduces a guided in-game permissions manager.
+This release fixes Endstone plugin discovery and adds bounded entity-hotspot diagnostics.
 
 ## Highlights
 
-- Open `/rank` to manage rank sets from Bedrock forms.
-- Select permissions by plugin/category and permission dropdown.
-- Set every explicit permission to **Allow**, **Deny**, or **Inherit / neutral**.
-- Rename visible rank titles such as `Admin` and select their Minecraft color.
-- Configure brackets, suffixes, weights, parent ranks, and online-player rank assignments.
-- Open `/permissions` for player-specific overrides.
-- Continue using the existing text commands from the server console or command automation.
+- Corrects the distribution name to `endstone-onistone-essentials`, matching the `onistone_essentials` entry point required by Endstone.
+- Adds bounded, paginated entity-hotspot scans to `/entityinfo` for finding dense chunks and entity clusters.
+- Adds guarded hotspot teleportation with safe-location selection and configurable scan limits.
+- Adds automatic snapshot expiry, concurrency limits, and incomplete-result reporting for busy servers.
+- Adds regression coverage for entry-point metadata, hotspot aggregation, scan budgeting, teleport safety, and command behavior.
 
 ## Upgrade notes
 
-On first start, existing configuration and databases are copied into `plugins/onistone_essentials/`. Saved rank and player permission nodes are translated to `onistone.*`. Back up the server before upgrading and remove the older wheel from `plugins/` before installing this release.
+The wheel filename changes from `endstone_essentialsbds-*.whl` to `endstone_onistone_essentials-*.whl`. Remove the old wheel before installing v3.5.1 or Endstone may discover both distributions. The Python package and `plugins/onistone_essentials/` data folder are unchanged, so existing configuration and databases remain compatible.
 
 ## Compatibility
 

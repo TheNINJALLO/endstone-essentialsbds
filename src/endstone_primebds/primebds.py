@@ -16,6 +16,7 @@ from endstone_primebds.commands import (
 from endstone_primebds.commands.Server.monitor import clear_all_monitor_intervals
 from endstone_primebds.commands.Misc.blockscan import clear_all_blockscan_intervals
 from endstone_primebds.utils.config_util import load_config
+from endstone_primebds.utils.entity_hotspot_service import EntityHotspotScanService
 
 from endstone_primebds.utils.db_util import UserDB, sessionDB, ServerDB, User, ModLog, ServerData
 import endstone_primebds.utils.internal_permissions_util as perms_util
@@ -74,6 +75,7 @@ class OnistoneEssentials(Plugin):
         self.silentmutes = set()
         self.isgod = set()
         self.crasher_patch_applied = set()
+        self.entity_hotspot_service = EntityHotspotScanService(self)
 
         # Multiworld Handler
         self.multiworld_processes = {}
@@ -161,6 +163,9 @@ class OnistoneEssentials(Plugin):
 
     @event_handler()
     def on_player_quit(self, ev: PlayerQuitEvent):
+        self.entity_hotspot_service.abandon(
+            self.entity_hotspot_service.sender_key(ev.player)
+        )
         handle_leave_event(self, ev)
 
     @event_handler()
@@ -210,6 +215,7 @@ class OnistoneEssentials(Plugin):
         self.check_for_inactive_sessions()
 
     def on_disable(self):
+        self.entity_hotspot_service.shutdown()
         stop_intervals(self)
         clear_all_blockscan_intervals(self)
         clear_all_monitor_intervals(self)

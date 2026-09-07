@@ -23,6 +23,7 @@
   <a href="#what-it-does">What it does</a> &bull;
   <a href="#how-to-use">How to use</a> &bull;
   <a href="#commands-and-permissions">Commands</a> &bull;
+  <a href="commands.md">Command guide</a> &bull;
   <a href="#install">Install</a> &bull;
   <a href="https://github.com/TheNINJALLO/endstone-essentialsbds/releases">Releases</a>
 </p>
@@ -37,6 +38,7 @@ An essentials plugin for diagnostics, stability, and quality of life on Minecraf
 - Loads each command as a separate configurable module so unwanted commands can be disabled.
 - Adds configurable chat, join/leave, combat, monitoring, multiworld, and server-stability behavior.
 - Includes an in-game permissions manager for rank sets, per-player overrides, inheritance, and rank appearance.
+- Finds the busiest loaded entity chunks and connected dense-chunk groups with stable, per-administrator scan results and guarded inspection teleports.
 
 ## How to use
 
@@ -47,6 +49,28 @@ An essentials plugin for diagnostics, stability, and quality of life on Minecraf
 5. Use **Manage player overrides** or `/permissions <player>` when one player needs an exception to their rank.
 
 Existing installations are migrated automatically on first start. Configuration, databases, ranks, and player permission overrides are retained, and old permission entries are translated to the `onistone.*` namespace.
+
+### Find an entity hotspot
+
+Operators can run the following inspection workflow:
+
+```text
+/entityinfo hotspots
+/entityinfo hotspots groups
+/entityinfo hotspots detail 1
+/entityinfo tp 1
+```
+
+The first command performs an on-demand scan of actors currently exposed by Endstone's loaded-actor API. The next commands reuse that administrator's immutable saved scan; viewing another page, switching ranking mode, opening a detail, or teleporting does not silently enumerate actors again. Use `/entityinfo hotspots refresh` when a new sample is needed.
+
+Chunk mode ranks vertical chunk columns. Group mode joins qualifying chunks in the same dimension through eight-neighbor X/Z adjacency, including diagonals. Groups are connected dense-chunk regions, not radius-based or three-dimensional clusters, and a chain of chunks may create a sprawling group. The detail output shows its extent and peak chunk.
+
+Players are excluded by default. Named, tamed, and custom actors remain eligible, and custom actors are classified through Endstone's `Mob`, `Item`, and `Player` types rather than a vanilla entity list. Each dropped item actor counts as one entity; exposed stack quantities are reported separately and never increase the entity count.
+
+> [!NOTE]
+> Results cover loaded actors only. Unloaded/saved entities and offline world files are not searched, no chunks are force-loaded, and multi-tick collection is a sampling window rather than an atomic world snapshot. A high entity count is a diagnostic lead, not proof of server lag.
+
+See [commands.md](commands.md) for every hotspot syntax, filters, permissions, output semantics, and configuration option.
 
 ### Permissions GUI
 
@@ -81,7 +105,7 @@ Existing installations are migrated automatically on first start. Configuration,
 | `/blockinfo [location: pos]` | Prints info of the facing block! | `onistone.command.blockinfo` |
 | `/blockscan (disable)[blockscan: blockscan]` | Continuously show information about the block you're looking at. | `onistone.command.blockscan` |
 | `/check <player: player> (info\|mod\|jail\|network\|world)[info: info]`<br><sub>Aliases: `/seen`</sub> | Checks a player's client info! | `onistone.command.check` |
-| `/entityinfo (list)[entity_action: entity_action] [page: int]` | Check entity information! | `onistone.command.entityinfo` |
+| `/entityinfo`<br>`/entityinfo list [page]`<br>`/entityinfo hotspots [page]`<br>`/entityinfo hotspots chunks [page]`<br>`/entityinfo hotspots groups [page]`<br>`/entityinfo hotspots detail <rank>`<br>`/entityinfo hotspots refresh`<br>`/entityinfo hotspots help`<br>`/entityinfo hotspots filter <chunks\|groups> <dimension> <type-or-category> [page]`<br>`/entityinfo tp <rank>` | Inspect a targeted entity, list loaded entity types, or find and safely inspect loaded-entity hotspots. | Base: `onistone.command.entityinfo`<br>Scan/view: `onistone.command.entityinfo.hotspots`<br>Teleport: `onistone.command.entityinfo.hotspots.teleport` |
 | `/heal [player: player]` | Sets player health to full! | `onistone.command.heal`, `onistone.command.heal.other` |
 | `/ping [player: player]` | Checks the server ping! | `onistone.command.ping` |
 | `/jail <player: player> <jail: string> <duration_number: int> (second\|minute\|hour\|day\|week\|month\|year)<duration_length: jail_length> [reason: message]`<br>`/jail <player: player> <jail: string> (forever)<perm_jail: perm_jail> [reason: message]` | Jails a player to a specified area! | `onistone.command.jail` |
@@ -115,17 +139,20 @@ Existing installations are migrated automatically on first start. Configuration,
 | Endstone API | `0.11` |
 | Bedrock Dedicated Server | `1.26.44` |
 | Python | `>=3.10` |
-| Plugin release | `v3.5.0` |
+| Plugin release | `v3.5.1` |
 
 ## Install
 
 Download the wheel from the matching GitHub release:
 
 ```bash
-gh release download v3.5.0 --repo TheNINJALLO/endstone-essentialsbds --pattern "*.whl"
+gh release download v3.5.1 --repo TheNINJALLO/endstone-essentialsbds --pattern "*.whl"
 ```
 
 Copy the downloaded wheel into the server's `plugins/` directory, remove any older wheel for the same plugin, and restart Endstone.
+
+> [!NOTE]
+> Starting with v3.5.1, the wheel is named `endstone_onistone_essentials-<version>-py3-none-any.whl`. Remove older `endstone_essentialsbds-*.whl` files before restarting so Endstone does not discover both distributions.
 
 > [!IMPORTANT]
 > Use Endstone `0.11.9` with BDS `1.26.44`. Back up worlds and plugin data before upgrading a production server.
@@ -133,6 +160,34 @@ Copy the downloaded wheel into the server's `plugins/` directory, remove any old
 ## Configuration and secrets
 
 Runtime databases, logs, local `.env` files, server directories, and root `config.toml` files are excluded from source releases. When an example configuration is provided, copy it locally and keep live tokens, passwords, webhook URLs, and server identifiers out of Git.
+
+Entity hotspot defaults are added under `modules.entity_hotspots` in `plugins/onistone_essentials/config.json`. Missing keys are merged on startup without replacing existing values:
+
+```json
+{
+  "modules": {
+    "entity_hotspots": {
+      "enabled": true,
+      "results_per_page": 5,
+      "include_players": false,
+      "scan_cooldown_seconds": 15,
+      "snapshot_lifetime_seconds": 300,
+      "max_retained_snapshots": 16,
+      "max_concurrent_scans": 1,
+      "max_actors": 20000,
+      "max_scan_seconds": 8.0,
+      "actors_per_tick": 750,
+      "dense_chunk_threshold": 10,
+      "teleport_enabled": true,
+      "teleport_horizontal_radius": 4,
+      "teleport_vertical_radius": 32,
+      "teleport_max_candidates": 512
+    }
+  }
+}
+```
+
+Endstone 0.11.9 exposes the loaded actor collection as one indivisible operation, so `actors_per_tick` bounds actor validation and primitive-data capture after that measured acquisition; it cannot bound the initial collection call. Hitting the actor, duration, or access limits marks the result `INCOMPLETE`.
 
 ## Release automation
 
