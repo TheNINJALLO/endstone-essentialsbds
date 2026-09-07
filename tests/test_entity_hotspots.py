@@ -228,6 +228,7 @@ def test_configuration_values_are_validated_and_clamped():
             "results_per_page": 999,
             "max_actors": "bad",
             "enabled": "not-a-boolean",
+            "write_report_file": False,
             "teleport_max_candidates": 1,
         }
     )
@@ -235,4 +236,5 @@ def test_configuration_values_are_validated_and_clamped():
     assert settings.results_per_page == 10
     assert settings.max_actors == 20_000
     assert settings.enabled is True
+    assert settings.write_report_file is False
     assert settings.teleport_max_candidates == 16

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "endstone-onistone-essentials"
-version = "3.5.2"
+version = "3.5.3"
 description = "An essentials plugin for diagnostics, stability, and quality of life on Minecraft Bedrock Edition."
 requires-python = ">=3.10"
 author = "Onistone"

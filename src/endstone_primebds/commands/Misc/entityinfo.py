@@ -245,7 +245,11 @@ def _send_scan_result(
         sender.send_message(f"§cEntity hotspot scan failed: {error}")
         return
     if snapshot is not None:
-        _show_snapshot(self, sender, snapshot, mode, page)
+        shown = _show_snapshot(self, sender, snapshot, mode, page)
+        if shown and self.entity_hotspot_service.settings().write_report_file:
+            sender.send_message(
+                f"§7Readable report queued: §f{self.entity_hotspot_service.report_path}"
+            )
 
 
 def _begin_scan(

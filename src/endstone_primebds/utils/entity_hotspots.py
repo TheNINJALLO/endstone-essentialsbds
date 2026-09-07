@@ -77,6 +77,7 @@ class HotspotFilter:
 @dataclass(frozen=True, slots=True)
 class HotspotSettings:
     enabled: bool = True
+    write_report_file: bool = True
     results_per_page: int = 5
     include_players: bool = False
     scan_cooldown_seconds: float = 15.0
@@ -115,6 +116,9 @@ class HotspotSettings:
 
         return cls(
             enabled=boolean("enabled", defaults.enabled),
+            write_report_file=boolean(
+                "write_report_file", defaults.write_report_file
+            ),
             results_per_page=integer("results_per_page", defaults.results_per_page, 1, 10),
             include_players=boolean("include_players", defaults.include_players),
             scan_cooldown_seconds=number(

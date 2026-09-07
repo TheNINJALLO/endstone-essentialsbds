@@ -91,6 +91,7 @@ def preload_settings():
         }),
         "entity_hotspots": OrderedDict({
             "enabled": True,
+            "write_report_file": True,
             "results_per_page": 5,
             "include_players": False,
             "scan_cooldown_seconds": 15,

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 import sys
+import threading
 import types
 
 from conftest import SRC_PACKAGE, load_source
@@ -14,6 +15,7 @@ from endstone_primebds.utils.entity_hotspots import (
 
 config_stub = types.ModuleType("endstone_primebds.utils.config_util")
 config_stub.load_config = lambda: {"modules": {"entity_hotspots": {}}}
+config_stub.CONFIG_FOLDER = "."
 sys.modules["endstone_primebds.utils.config_util"] = config_stub
 service_module = load_source(
     "endstone_primebds.utils.entity_hotspot_service",
@@ -90,23 +92,55 @@ def sample(stable_id: str, x: float = 1.0):
     )
 
 
-def make_service(actors, **changes):
+def make_service(actors, report_writer=None, **changes):
     clock = Clock()
-    settings = replace(
-        HotspotSettings(),
-        scan_cooldown_seconds=0,
-        actors_per_tick=1,
-        dense_chunk_threshold=1,
-        **changes,
-    )
+    setting_changes = {
+        "scan_cooldown_seconds": 0,
+        "actors_per_tick": 1,
+        "dense_chunk_threshold": 1,
+        "write_report_file": False,
+    }
+    setting_changes.update(changes)
+    settings = replace(HotspotSettings(), **setting_changes)
     plugin = Plugin(actors)
     service = EntityHotspotScanService(
         plugin,
         settings_provider=lambda: settings,
         wall_clock=clock.wall,
         monotonic_clock=clock.monotonic,
+        report_writer=report_writer or (lambda _snapshot: None),
     )
     return service, plugin, clock
+
+
+def test_completed_scan_writes_report_off_the_scan_callback():
+    reported = []
+    written = threading.Event()
+    server_thread = threading.get_ident()
+
+    def report_writer(snapshot):
+        reported.append((snapshot, threading.get_ident()))
+        written.set()
+
+    service, plugin, _clock = make_service(
+        [sample("one")],
+        report_writer=report_writer,
+        write_report_file=True,
+    )
+    completed = []
+    service.start_scan(
+        "admin",
+        "chunks",
+        HotspotFilter.create(),
+        lambda value: value,
+        lambda snapshot, error, page: completed.append(snapshot),
+    )
+    run_until_idle(plugin)
+
+    assert written.wait(1)
+    assert reported[0][0] is completed[0]
+    assert reported[0][1] != server_thread
+    service.shutdown()
 
 
 def run_until_idle(plugin, maximum_ticks=20):

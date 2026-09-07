@@ -84,6 +84,8 @@ Both new permissions are explicitly registered with operator-only defaults. The 
 
 Each header reports scan ID, completion time and age, examined/matched/skipped counts, duration, page, completion status, and a loaded-only notice. Absolute ranks, pages, details, and teleports remain bound to that administrator's immutable snapshot. An expired snapshot refuses the action and tells the administrator to refresh.
 
+Every completed scan also replaces `plugins/onistone_essentials/entity_hotspot_report.md`. This Markdown file contains the full scan summary, all ranked chunks, all dense groups, coordinates, category totals, Y ranges, and entity-type counts. It is written atomically on a background worker and does not accumulate unbounded historical files.
+
 ## Configuration
 
 Settings live at `modules.entity_hotspots` in `plugins/onistone_essentials/config.json`.
@@ -91,6 +93,7 @@ Settings live at `modules.entity_hotspots` in `plugins/onistone_essentials/confi
 | Setting | Default | Meaning |
 |---|---:|---|
 | `enabled` | `true` | Enables hotspot subcommands. |
+| `write_report_file` | `true` | Writes the latest complete or incomplete scan to `entity_hotspot_report.md` in the plugin data folder. |
 | `results_per_page` | `5` | Compact results per chat page, clamped to 1–10. |
 | `include_players` | `false` | Includes players in `all` scans when enabled. |
 | `scan_cooldown_seconds` | `15` | Per-sender delay between new scans. |

@@ -2,12 +2,18 @@
 
 from __future__ import annotations
 
+from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass, field
+from pathlib import Path
 import threading
 import time
 from typing import Callable
 
-from endstone_primebds.utils.config_util import load_config
+from endstone_primebds.utils.config_util import CONFIG_FOLDER, load_config
+from endstone_primebds.utils.entity_hotspot_report import (
+    REPORT_FILENAME,
+    write_hotspot_report,
+)
 from endstone_primebds.utils.entity_hotspots import (
     ActorSample,
     HotspotFilter,
@@ -22,6 +28,7 @@ from endstone_primebds.utils.entity_hotspots import (
 
 ActorReader = Callable[[object], ActorSample | None]
 CompletionCallback = Callable[[HotspotSnapshot | None, str | None, int], None]
+ReportWriter = Callable[[HotspotSnapshot], object]
 
 
 def load_hotspot_settings() -> HotspotSettings:
@@ -74,6 +81,8 @@ class EntityHotspotScanService:
         settings_provider: Callable[[], HotspotSettings] = load_hotspot_settings,
         wall_clock: Callable[[], float] = time.time,
         monotonic_clock: Callable[[], float] = time.monotonic,
+        report_directory: str | Path | None = None,
+        report_writer: ReportWriter | None = None,
     ):
         self._plugin = plugin
         self._settings_provider = settings_provider
@@ -89,6 +98,14 @@ class EntityHotspotScanService:
         self._scan_sequence = 0
         self._stopped = False
         self._lock = threading.RLock()
+        self.report_path = Path(report_directory or CONFIG_FOLDER) / REPORT_FILENAME
+        self._report_writer = report_writer or (
+            lambda snapshot: write_hotspot_report(snapshot, self.report_path.parent)
+        )
+        self._report_executor = ThreadPoolExecutor(
+            max_workers=1, thread_name_prefix="onistone-hotspot-report"
+        )
+        self._report_future: Future | None = None
 
     @staticmethod
     def sender_key(sender) -> str:
@@ -208,6 +225,7 @@ class EntityHotspotScanService:
             self._generation.clear()
             self._last_started.clear()
         self.snapshots.clear()
+        self._report_executor.shutdown(wait=False, cancel_futures=True)
 
     def _tick(self, owner_key: str, generation: int) -> None:
         with self._lock:
@@ -317,11 +335,51 @@ class EntityHotspotScanService:
             callback = state.callback
             state.callback = lambda _snapshot, _error, _page: None
 
+        if state.settings.write_report_file:
+            self._queue_report(snapshot)
         try:
             callback(snapshot, None, 1)
         except Exception:
             # A player may disconnect between scan ticks. No live object is retained.
             pass
+
+    def _queue_report(self, snapshot: HotspotSnapshot) -> None:
+        """Keep at most the active write and the newest pending report."""
+
+        with self._lock:
+            if self._stopped:
+                return
+            previous = self._report_future
+            if previous is not None and not previous.running() and not previous.done():
+                previous.cancel()
+            try:
+                future = self._report_executor.submit(self._report_writer, snapshot)
+            except RuntimeError as exc:
+                self._warn_report_failure(exc)
+                return
+            self._report_future = future
+            future.add_done_callback(self._report_finished)
+
+    def _report_finished(self, future: Future) -> None:
+        if future.cancelled():
+            return
+        try:
+            error = future.exception()
+        except Exception as exc:
+            error = exc
+        if error is not None:
+            self._warn_report_failure(error)
+
+    def _warn_report_failure(self, error: BaseException) -> None:
+        message = f"Could not write entity hotspot report: {error}"
+        logger = getattr(self._plugin, "logger", None)
+        if logger is not None:
+            try:
+                logger.warning(message)
+                return
+            except Exception:
+                pass
+        print(f"[Onistone Essentials] {message}")
 
     def _fail(self, state: _ActiveScan, message: str) -> None:
         state.samples.clear()

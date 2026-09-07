@@ -139,14 +139,14 @@ See [commands.md](commands.md) for every hotspot syntax, filters, permissions, o
 | Endstone API | `0.11` |
 | Bedrock Dedicated Server | `1.26.44` |
 | Python | `>=3.10` |
-| Plugin release | `v3.5.2` |
+| Plugin release | `v3.5.3` |
 
 ## Install
 
 Download the wheel from the matching GitHub release:
 
 ```bash
-gh release download v3.5.2 --repo TheNINJALLO/endstone-essentialsbds --pattern "*.whl"
+gh release download v3.5.3 --repo TheNINJALLO/endstone-essentialsbds --pattern "*.whl"
 ```
 
 Copy the downloaded wheel into the server's `plugins/` directory, remove any older wheel for the same plugin, and restart Endstone.
@@ -168,6 +168,7 @@ Entity hotspot defaults are added under `modules.entity_hotspots` in `plugins/on
   "modules": {
     "entity_hotspots": {
       "enabled": true,
+      "write_report_file": true,
       "results_per_page": 5,
       "include_players": false,
       "scan_cooldown_seconds": 15,
@@ -186,6 +187,8 @@ Entity hotspot defaults are added under `modules.entity_hotspots` in `plugins/on
   }
 }
 ```
+
+Every completed scan also atomically replaces the easy-to-read Markdown report at `plugins/onistone_essentials/entity_hotspot_report.md`. It contains the full summary plus every ranked chunk and dense group. Report formatting and disk I/O run on one background worker so large reports do not block the server tick; set `write_report_file` to `false` to disable the file.
 
 Endstone 0.11.9 exposes the loaded actor collection as one indivisible operation, so `actors_per_tick` bounds actor validation and primitive-data capture after that measured acquisition; it cannot bound the initial collection call. Hitting the actor, duration, or access limits marks the result `INCOMPLETE`.
 
