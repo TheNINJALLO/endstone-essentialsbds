@@ -12,7 +12,7 @@
   <img alt="Endstone 0.11.13" src="https://img.shields.io/badge/Endstone-0.11.13-52b7a8?style=flat-square">
   <img alt="API 0.11" src="https://img.shields.io/badge/API-0.11-63b8ff?style=flat-square">
   <img alt="BDS 1.26.52.3" src="https://img.shields.io/badge/BDS-1.26.52.3-8b7dff?style=flat-square">
-  <img alt="Python >=3.10" src="https://img.shields.io/badge/Python-%3E=3.10-3776AB?style=flat-square&amp;logo=python&amp;logoColor=white">
+  <img alt="Python >=3.11" src="https://img.shields.io/badge/Python-%3E=3.11-3776AB?style=flat-square&amp;logo=python&amp;logoColor=white">
 </p>
 
 <p align="center">
@@ -140,7 +140,7 @@ See [commands.md](commands.md) for every hotspot syntax, filters, permissions, o
 | Endstone | `0.11.13` |
 | Endstone API | `0.11` |
 | Bedrock Dedicated Server | `1.26.52.3` |
-| Python | `>=3.10` |
+| Python | `>=3.11` |
 | Plugin release | `v3.5.5` |
 
 ## Install
