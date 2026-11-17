@@ -1,3 +1,7 @@
+[Download compatibility release v3.5.6](https://github.com/TheNINJALLO/endstone-essentialsbds/releases/tag/v3.5.6).
+
+> Compatibility update **3.5.6** targets **Endstone 0.11.16 / BDS 1.26.65.1**, protocol **2225**, Python **3.11+**. API level remains **0.11**. Keep configuration and player data when replacing the wheel. Earlier acceptance records below describe their original builds; current qualification is tracked in the workspace upgrade report.
+
 <!-- endstone-professional-header:start -->
 <p align="center">
   <img src="docs/assets/banner.svg" width="100%" alt="Onistone Essentials &mdash; server administration and quality-of-life tools for Endstone">
@@ -9,9 +13,9 @@
 </p>
 
 <p align="center">
-  <img alt="Endstone 0.11.13" src="https://img.shields.io/badge/Endstone-0.11.13-52b7a8?style=flat-square">
+  <img alt="Endstone 0.11.16" src="https://img.shields.io/badge/Endstone-0.11.16-52b7a8?style=flat-square">
   <img alt="API 0.11" src="https://img.shields.io/badge/API-0.11-63b8ff?style=flat-square">
-  <img alt="BDS 1.26.52.3" src="https://img.shields.io/badge/BDS-1.26.52.3-8b7dff?style=flat-square">
+  <img alt="BDS 1.26.65.1" src="https://img.shields.io/badge/BDS-1.26.65.1-8b7dff?style=flat-square">
   <img alt="Python >=3.11" src="https://img.shields.io/badge/Python-%3E=3.11-3776AB?style=flat-square&amp;logo=python&amp;logoColor=white">
 </p>
 
@@ -148,7 +152,7 @@ See [commands.md](commands.md) for every hotspot syntax, filters, permissions, o
 Download the wheel from the matching GitHub release:
 
 ```bash
-gh release download v3.5.5 --repo TheNINJALLO/endstone-essentialsbds --pattern "*.whl"
+gh release download v3.5.6 --repo TheNINJALLO/endstone-essentialsbds --pattern "*.whl"
 ```
 
 Copy the downloaded wheel into the server's `plugins/` directory, remove any older wheel for the same plugin, and restart Endstone.
